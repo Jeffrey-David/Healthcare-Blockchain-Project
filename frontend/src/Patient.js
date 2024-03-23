@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Breadcrumb, Layout, Menu, theme, Select, Typography, Table, Tag, Button, Modal, Form, DatePicker, Row, Col } from 'antd';
+import { Breadcrumb, Layout, Menu, theme, Select, Typography, Table, Tag, Button, Modal, Form, DatePicker} from 'antd';
 import logo from './logo-main.svg';
 import { PlusOutlined } from '@ant-design/icons';
 
@@ -179,21 +179,32 @@ const App: React.FC = () => {
                             footer={null}
                         >
 
-                            <Row>
-                                <Col span={5}><strong>Booking ID:</strong></Col>
-                                <Col>{currentRecord?.bookingId}</Col>
-                            </Row>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(24, 1fr)', height: '100%', gap: '10px' }}>
+                                <div style={{ gridColumn: 'span 7' }}><strong>Booking ID</strong></div>
+                                <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{currentRecord?.bookingId}</div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
-                                {/* <p><strong>Booking ID:</strong> {currentRecord?.bookingId}</p> */}
-                                <p><strong>Full Name:</strong> {identity?.fullName}</p>
-                                <p><strong>Age:</strong> {identity?.age}</p>
-                                <p><strong>Address:</strong> {identity?.address}</p>
-                                <p><strong>Appointment Date:</strong> {currentRecord?.appointmentDate}</p>
-                                <p><strong>Appointment Slot:</strong> {currentRecord?.appointmentSlot}</p>
-                                <p><strong>Fee:</strong> {currentRecord?.bookingFee}</p>
-                                <p><strong>Status:</strong> {currentRecord?.status}</p>
-                                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                                <div style={{ gridColumn: 'span 7' }}><strong>Full Name</strong></div>
+                                <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{identity?.fullName}</div>
+
+                                <div style={{ gridColumn: 'span 7' }}><strong>Age</strong></div>
+                                <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{identity?.age}</div>
+
+                                <div style={{ gridColumn: 'span 7' }}><strong>Address</strong></div>
+                                <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{identity?.address}</div>
+
+                                <div style={{ gridColumn: 'span 7' }}><strong>Appointment Date</strong></div>
+                                <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{currentRecord?.appointmentDate}</div>
+
+                                <div style={{ gridColumn: 'span 7' }}><strong>Appointment Slot</strong></div>
+                                <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{currentRecord?.appointmentSlot}</div>
+
+                                <div style={{ gridColumn: 'span 7' }}><strong>Fee</strong></div>
+                                <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{currentRecord?.bookingFee}</div>
+
+                                <div style={{ gridColumn: 'span 7' }}><strong>Status</strong></div>
+                                <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{currentRecord?.status}</div>
+
+                                <div style={{ gridColumn: 'span 24', display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
                                     <Button type="primary" onClick={() => setVisible(false)}>Close</Button>
                                 </div>
                             </div>

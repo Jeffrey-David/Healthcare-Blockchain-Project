@@ -178,13 +178,22 @@ const App: React.FC = () => {
                             onCancel={() => setVisible(false)}
                             footer={null}
                         >
-                            <p><strong>Wallet Address:</strong> {currentRecord?.walletAddress}</p>
-                            <p><strong>Requested Date:</strong> {currentRecord?.requestedDate}</p>
-                            <p><strong>Status:</strong> {currentRecord?.status}</p>
-                            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                                <Button type="primary" style={{ margin: '0 10px' }} onClick={() => setVisible(false)}>Approve</Button>
-                                <Button danger type="primary" style={{ margin: '0 10px' }} onClick={() => setVisible(false)}>Reject</Button>
-                                <Button type="default" style={{ margin: '0 10px' }} onClick={() => setVisible(false)}>Back</Button>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(24, 1fr)', height: '100%', gap: '10px' }}>
+                                <div style={{ gridColumn: 'span 6' }}><strong>Wallet Address</strong></div>
+                                <div style={{ gridColumn: 'span 18', marginLeft: '8px' }}>{currentRecord?.walletAddress}</div>
+
+                                <div style={{ gridColumn: 'span 6' }}><strong>Requested Date</strong></div>
+                                <div style={{ gridColumn: 'span 18', marginLeft: '8px' }}>{currentRecord?.requestedDate}</div>
+
+                                <div style={{ gridColumn: 'span 6' }}><strong>Status</strong></div>
+                                <div style={{ gridColumn: 'span 18', marginLeft: '8px' }}>{currentRecord?.status}</div>
+
+                                <div style={{ gridColumn: 'span 24', display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                                    <Button type="primary" style={{ margin: '0 10px' }} onClick={() => setVisible(false)}>Approve</Button>
+                                    <Button danger type="primary" style={{ margin: '0 10px' }} onClick={() => setVisible(false)}>Reject</Button>
+                                    <Button type="default" style={{ margin: '0 10px' }} onClick={() => setVisible(false)}>Back</Button>
+                                </div>
                             </div>
                         </Modal>
 

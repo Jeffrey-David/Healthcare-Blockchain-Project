@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Breadcrumb, Layout, Menu, theme, Select, Typography, Table, Button, Modal, Form, Input, DatePicker } from 'antd';
+import { Breadcrumb, Layout, Menu, theme, Select, Typography, Table, Button, Modal} from 'antd';
 import logo from './logo-main.svg';
 
 const { Title } = Typography;
@@ -88,7 +88,6 @@ const App: React.FC = () => {
 
     const [visible, setVisible] = useState(false);
     const [currentRecord, setCurrentRecord] = useState(null);
-    const [createVisible, setCreateVisible] = useState(false);
 
     return (
         <Layout>
@@ -155,47 +154,29 @@ const App: React.FC = () => {
                             onCancel={() => setVisible(false)}
                             footer={null}
                         >
-                            <p><strong>Full Name:</strong> {currentRecord?.fullName}</p>
-                            <p><strong>Age:</strong> {currentRecord?.age}</p>
-                            <p><strong>Address:</strong> {currentRecord?.address}</p>
-                            <p><strong>Latest Appointment Date:</strong> {currentRecord?.latestAppointmentDate}</p>
-                            <p><strong>Detail:</strong> {currentRecord?.detailMedicalRecord}</p>
-                            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                                <Button type="primary" onClick={() => setVisible(false)}>Close</Button>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(24, 1fr)', height: '100%' }}>
+                                <div style={{ gridColumn: 'span 7' }}><strong>Full Name</strong></div>
+                                <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{currentRecord?.fullName}</div>
+
+                                <div style={{ gridColumn: 'span 7' }}><strong>Age</strong></div>
+                                <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{currentRecord?.age}</div>
+
+                                <div style={{ gridColumn: 'span 7' }}><strong>Address</strong></div>
+                                <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{currentRecord?.address}</div>
+
+                                <div style={{ gridColumn: 'span 7' }}><strong>Latest Appointment</strong></div>
+                                <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{currentRecord?.latestAppointmentDate}</div>
+
+                                <div style={{ gridColumn: 'span 7' }}><strong>Detail</strong></div>
+                                <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{currentRecord?.detailMedicalRecord}</div>
+
+                                <div style={{ gridColumn: 'span 24', display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                                    <Button type="primary" onClick={() => setVisible(false)}>Close</Button>
+                                </div>
                             </div>
                         </Modal>
 
-                        <Modal
-                            title="Create New Booking"
-                            visible={createVisible}
-                            onCancel={() => setCreateVisible(false)}
-                            footer={null}
-                        >
-                            <Form layout="vertical" onFinish={() => setCreateVisible(false)}>
-                                <Form.Item label="Full Name">
-                                    <Input style={{ width: '100%' }} />
-                                </Form.Item>
-                                <Form.Item label="Age">
-                                    <Input style={{ width: '100%' }} />
-                                </Form.Item>
-                                <Form.Item label="Address">
-                                    <Input style={{ width: '100%' }} />
-                                </Form.Item>
-                                <Form.Item label="Appointment Date">
-                                    <DatePicker style={{ width: '100%' }} />
-                                </Form.Item>
-                                <Form.Item label="Appointment Slot">
-                                    <Select style={{ width: '100%' }}>
-                                        <Option value="10:00 - 11:00">10:00 - 11:00</Option>
-                                        <Option value="11:00 - 12:00">11:00 - 12:00</Option>
-                                        <Option value="12:00 - 13:00">12:00 - 13:00</Option>
-                                    </Select>
-                                </Form.Item>
-                                <Form.Item style={{ marginBottom: 0 }}>
-                                    <Button type="primary" htmlType="submit" style={{ width: '100%' }}>Create Booking</Button>
-                                </Form.Item>
-                            </Form>
-                        </Modal>
+                       
                     </Content>
                 </Layout>
             </Layout>

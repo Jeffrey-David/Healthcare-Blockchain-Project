@@ -71,7 +71,7 @@ const App: React.FC = () => {
                 }
 
                 return (
-                    <Button type="primary" onClick={() => { setVisible(true); setCurrentRecord(record); }}>Release</Button>
+                    <Button type="default" onClick={() => { setVisible(true); setCurrentRecord(record); }}>Release</Button>
                 );
             },
         },
@@ -174,23 +174,36 @@ const App: React.FC = () => {
                         </div>
                         <Table columns={columns} dataSource={data} />
                         <Modal
-                            title="Booking Detail"
+                            title="Record Detail"
                             visible={visible}
                             onCancel={() => setVisible(false)}
                             footer={null}
                         >
-                            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
-                                <p><strong>Booking ID:</strong> {currentRecord?.bookingId}</p>
-                                <p><strong>Full Name:</strong> {currentRecord?.fullName}</p>
-                                <p><strong>Age:</strong> {currentRecord?.age}</p>
-                                <p><strong>Address:</strong> {currentRecord?.address}</p>
-                                <p><strong>Latest Appointment Date:</strong> {currentRecord?.appointmentDate}</p>
-                                <p><strong>Record Detail:</strong> {currentRecord?.recordDetail}</p>
-                                <p><strong>Status:</strong> {currentRecord?.status}</p>
-                                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                                    <Button type="primary" style={{ margin: '0 10px' }} onClick={() => setVisible(false)}>Release</Button>
-                                    <Button danger type="primary" style={{ margin: '0 10px' }} onClick={() => setVisible(false)}>Reject</Button>
-                                    <Button type="default" style={{ margin: '0 10px' }} onClick={() => setVisible(false)}>Back</Button>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(24, 1fr)', height: '100%', gap: '10px' }}>
+                                <div style={{ gridColumn: 'span 8' }}><strong>Booking ID</strong></div>
+                                <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.bookingId}</div>
+
+                                <div style={{ gridColumn: 'span 8' }}><strong>Full Name</strong></div>
+                                <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.fullName}</div>
+
+                                <div style={{ gridColumn: 'span 8' }}><strong>Age</strong></div>
+                                <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.age}</div>
+
+                                <div style={{ gridColumn: 'span 8' }}><strong>Address</strong></div>
+                                <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.address}</div>
+
+                                <div style={{ gridColumn: 'span 8' }}><strong>Latest Appointment</strong></div>
+                                <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.appointmentDate}</div>
+
+                                <div style={{ gridColumn: 'span 8' }}><strong>Record Detail</strong></div>
+                                <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.recordDetail}</div>
+
+                                <div style={{ gridColumn: 'span 8' }}><strong>Status</strong></div>
+                                <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.status}</div>
+
+                                <div style={{ gridColumn: 'span 24', display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                                    <Button type="primary" onClick={() => setVisible(false)}>Close</Button>
                                 </div>
                             </div>
                         </Modal>

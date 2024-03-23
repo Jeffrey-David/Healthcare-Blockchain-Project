@@ -172,15 +172,30 @@ const App: React.FC = () => {
                             onCancel={() => setVisible(false)}
                             footer={null}
                         >
-                            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
-                                <p><strong>Request to:</strong> {currentRecord?.walletAddress}</p>
-                                <p><strong>Full Name:</strong> {currentRecord?.fullName}</p>
-                                <p><strong>Age:</strong> {currentRecord?.age}</p>
-                                <p><strong>Address:</strong> {currentRecord?.address}</p>
-                                <p><strong>Latest Appointment Date:</strong> {currentRecord?.appointmentDate}</p>
-                                <p><strong>Record Detail:</strong> {currentRecord?.recordDetail}</p>
-                                <p><strong>Status:</strong> {currentRecord?.status}</p>
-                                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(24, 1fr)', height: '100%', gap: '10px' }}>
+                                <div style={{ gridColumn: 'span 8' }}><strong>Request to</strong></div>
+                                <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.walletAddress}</div>
+
+                                <div style={{ gridColumn: 'span 8' }}><strong>Full Name</strong></div>
+                                <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.fullName}</div>
+
+                                <div style={{ gridColumn: 'span 8' }}><strong>Age</strong></div>
+                                <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.age}</div>
+
+                                <div style={{ gridColumn: 'span 8' }}><strong>Address</strong></div>
+                                <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.address}</div>
+
+                                <div style={{ gridColumn: 'span 8' }}><strong>Latest Appointment</strong></div>
+                                <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.appointmentDate}</div>
+
+                                <div style={{ gridColumn: 'span 8' }}><strong>Record Detail</strong></div>
+                                <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.recordDetail}</div>
+
+                                <div style={{ gridColumn: 'span 8' }}><strong>Status</strong></div>
+                                <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.status}</div>
+
+                                <div style={{ gridColumn: 'span 24', display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
                                     <Button type="primary" onClick={() => setVisible(false)}>Close</Button>
                                 </div>
                             </div>

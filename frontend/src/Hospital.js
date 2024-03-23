@@ -71,7 +71,7 @@ const App: React.FC = () => {
                 }
 
                 return (
-                    <Button type="primary" onClick={() => { setVisible(true); setCurrentRecord(record); }}>Approve</Button>
+                    <Button type="default" onClick={() => { setVisible(true); setCurrentRecord(record); }}>Approve</Button>
                 );
             },
         },
