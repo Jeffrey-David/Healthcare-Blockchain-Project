@@ -171,7 +171,7 @@ const App: React.FC = () => {
                                 <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.detailMedicalRecord}</div>
 
                                 <div style={{ gridColumn: 'span 24', display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                                    <Button type="primary" onClick={() => setVisible(false)}>Close</Button>
+                                    <Button type="default" onClick={() => setVisible(false)}>Close</Button>
                                 </div>
                             </div>
                         </Modal>

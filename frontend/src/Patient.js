@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Breadcrumb, Layout, Menu, theme, Select, Typography, Table, Tag, Button, Modal, Form, DatePicker} from 'antd';
+import { Breadcrumb, Layout, Menu, theme, Select, Typography, Table, Tag, Button, Modal, Form, DatePicker } from 'antd';
 import logo from './logo-main.svg';
 import { PlusOutlined } from '@ant-design/icons';
 
@@ -59,9 +59,20 @@ const App: React.FC = () => {
             render: (text, record) => {
                 let buttonText = 'Detail';
                 let buttonAction = () => { setVisible(true); setCurrentRecord(record); };
-                if (record.status === 'Waiting for Payment') {
-                    buttonText = 'Pay Now';
-                    buttonAction = () => { };
+                if (record.status === 'Waiting for Confirmation') {
+                    buttonText = 'Confirm Treatment';
+                    buttonAction = () => {
+                        Modal.confirm({
+                            title: 'Confirm Treatment',
+                            content: 'Are you sure you want to confirm this treatment?',
+                            onOk() {
+                                // Handle the confirmation action here
+                            },
+                            onCancel() {
+                                // Handle the cancellation action here
+                            },
+                        });
+                    };
                 }
 
                 return (
@@ -97,7 +108,7 @@ const App: React.FC = () => {
             bookingFee: '20 DEH',
             appointmentDate: '2022-01-03',
             appointmentSlot: '12:00 - 13:00',
-            status: 'Waiting for Payment',
+            status: 'Waiting for Confirmation',
         },
     ];
 
@@ -205,7 +216,7 @@ const App: React.FC = () => {
                                 <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{currentRecord?.status}</div>
 
                                 <div style={{ gridColumn: 'span 24', display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                                    <Button type="primary" onClick={() => setVisible(false)}>Close</Button>
+                                    <Button type="default" onClick={() => setVisible(false)}>Close</Button>
                                 </div>
                             </div>
                         </Modal>

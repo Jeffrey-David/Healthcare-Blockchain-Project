@@ -68,7 +68,18 @@ const App: React.FC = () => {
 
                 if (record.status === 'Approved') {
                     buttonText = 'Revoke Access';
-                    buttonAction = () => { /* Add your revoke access logic here */ };
+                    buttonAction = () => {
+                        Modal.confirm({
+                            title: 'Do you want to revoke this access?',
+                            content: 'When clicked the OK button, this access will be revoked',
+                            onOk() {
+                                // Add your revoke access logic here
+                            },
+                            onCancel() {
+                                // Optional cancel logic here
+                            },
+                        });
+                    };
                 } else if (record.status === 'Waiting for Approval') {
                     buttonText = 'Approve';
                     buttonAction = () => { setVisible(true); setCurrentRecord(record); };
@@ -176,9 +187,12 @@ const App: React.FC = () => {
                             title="Request Detail"
                             visible={visible}
                             onCancel={() => setVisible(false)}
-                            footer={null}
+                            footer={[
+                                <Button key="Cancel" type="default" onClick={() => setVisible(false)}>Cancel</Button>,
+                                <Button key="Approve" type="primary" onClick={() => setVisible(false)}>Approve</Button>,
+                                <Button key="Reject" danger type="primary" onClick={() => setVisible(false)}>Reject</Button>
+                            ]}
                         >
-
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(24, 1fr)', height: '100%', gap: '10px' }}>
                                 <div style={{ gridColumn: 'span 6' }}><strong>Wallet Address</strong></div>
                                 <div style={{ gridColumn: 'span 18', marginLeft: '8px' }}>{currentRecord?.walletAddress}</div>
@@ -188,16 +202,8 @@ const App: React.FC = () => {
 
                                 <div style={{ gridColumn: 'span 6' }}><strong>Status</strong></div>
                                 <div style={{ gridColumn: 'span 18', marginLeft: '8px' }}>{currentRecord?.status}</div>
-
-                                <div style={{ gridColumn: 'span 24', display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                                    <Button type="primary" style={{ margin: '0 10px' }} onClick={() => setVisible(false)}>Approve</Button>
-                                    <Button danger type="primary" style={{ margin: '0 10px' }} onClick={() => setVisible(false)}>Reject</Button>
-                                    <Button type="default" style={{ margin: '0 10px' }} onClick={() => setVisible(false)}>Back</Button>
-                                </div>
                             </div>
                         </Modal>
-
-
                     </Content>
                 </Layout>
             </Layout>

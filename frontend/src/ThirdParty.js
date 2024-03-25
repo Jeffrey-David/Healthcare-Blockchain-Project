@@ -42,11 +42,27 @@ const App: React.FC = () => {
             title: 'Status',
             key: 'status',
             dataIndex: 'status',
-            render: status => (
-                <Tag color={status === 'Approved' ? 'green' : 'orange'} key={status}>
-                    {status.toUpperCase()}
-                </Tag>
-            ),
+            render: status => {
+                let color;
+                switch (status) {
+                    case 'Approved':
+                        color = 'green';
+                        break;
+                    case 'Waiting for Approval':
+                        color = 'orange';
+                        break;
+                    case 'Access Revoked':
+                        color = 'red';
+                        break;
+                    default:
+                        color = 'gray';
+                }
+                return (
+                    <Tag color={color} key={status}>
+                        {status.toUpperCase()}
+                    </Tag>
+                );
+            },
         },
         {
             title: 'Action',
@@ -101,7 +117,7 @@ const App: React.FC = () => {
             address: null,
             appointmentDate: null,
             recordDetail: null,
-            status: 'Waiting for Approval',
+            status: 'Access Revoked',
         },
     ];
 
@@ -196,7 +212,7 @@ const App: React.FC = () => {
                                 <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.status}</div>
 
                                 <div style={{ gridColumn: 'span 24', display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                                    <Button type="primary" onClick={() => setVisible(false)}>Close</Button>
+                                    <Button type="default" onClick={() => setVisible(false)}>Close</Button>
                                 </div>
                             </div>
                         </Modal>
