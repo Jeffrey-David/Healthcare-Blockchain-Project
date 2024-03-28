@@ -25,7 +25,7 @@ contract MedicalAppointment {
     address public hospital;
     mapping(address => Patient) public patients;
     mapping(address => Appointment[]) public allAppointments;
-    IERC20 public dehToken;
+    DEHToken public dehToken;
     MedicalRecordAccess public medicalRecordAccess; // Instance of the other smart contract
 
     constructor(address _hospital, address _dehTokenAddress, address _medicalRecordAccess) {
@@ -75,12 +75,23 @@ contract MedicalAppointment {
         Patient storage patient = patients[msg.sender];
         Appointment storage appointment = patient.appointments[_patientIndex];
         require(appointment.status == AppointmentStatus.ServiceProvided, "Appointment status must be Service Provided");
-        require(dehToken.transfer(msg.sender, appointment.fee), "Token transfer failed");
+
+        // Calculate the half fee
+        uint halfFee = appointment.fee / 2;
+
+        // Transfer half of the fee to the hospital
+        require(dehToken.transfer(hospital, halfFee), "Token transfer to hospital failed");
+
+        // Transfer half of the fee to the patient
+        require(dehToken.transfer(msg.sender, halfFee), "Token transfer to patient failed");
+
         appointment.status = AppointmentStatus.RecordReleased;
 
         // Call the storeRecord function from the MedicalRecordAccess contract
         medicalRecordAccess.storeRecord(patient.patientAddress, _medicalRecord);
     }
+
+
 
     function getAllAppointments() public view returns (Appointment[] memory) {
         return allAppointments[msg.sender];
