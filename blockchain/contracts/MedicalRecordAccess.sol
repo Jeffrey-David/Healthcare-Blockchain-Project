@@ -29,15 +29,26 @@ contract MedicalRecordAccess {
 
     constructor() {}
 
-    function storeRecord(address _patientAddress, string memory _medicalRecord) public {
+    function storeRecord(address _patientAddress, string memory _patientName, string memory _medicalRecord) public {
+        // Find the patient
         Patient storage patient = patients[_patientAddress];
-        patient.name = "Patient"; // Just for demonstration
+
+        // Update the patient's name
+        patient.name = _patientName;
+
+        // Push the medical record to the patient's medical records array
         patient.medicalRecords.push(_medicalRecord);
+
+        // Check if the patient is already registered
         if (!isPatient[_patientAddress]) {
+            // Add the patient to the list of all patients
             allPatients.push(_patientAddress);
+
+            // Mark the patient as registered
             isPatient[_patientAddress] = true;
         }
     }
+
 
 
     function grantAccess(address _patient, address payable _thirdParty) public {
