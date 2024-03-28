@@ -6,26 +6,19 @@ contract MedicalRecordAccess {
         address patientAddress; // Address of the patient
         string name;
         string[] medicalRecords; 
-        mapping(address => bool) accessList;
-        mapping(address => AccessRequest[]) accessRequests; // Mapping from requester address to access requests
+        mapping(address => AccessInfo[]) accessList; // Array of AccessInfo for each third party
     }
 
-    struct ThirdParty {
-        address thirdPartyAddress;
-        address[] patientAccessList;
-    }
-
-    struct AccessRequest {
-        address requester; // Address of the requester
-        uint requestedDate; // Timestamp when the request was made
-        uint approvedDate; // Timestamp when the request was approved
-        bool isApproved; // Flag indicating whether the request is approved or not
+    struct AccessInfo {
+        address thirdParty; // Address of the third party
+        uint requestDate; // Timestamp when the request was made
+        bool status; // Flag indicating whether the request is approved or not
     }
 
     mapping(address => Patient) public patients;
     mapping(address => bool) public isPatient;
     address[] public allPatients;
-    mapping(address => ThirdParty) public thirdParties;
+    mapping(address => bool) public isThirdParty;
 
     constructor() {}
 
@@ -49,65 +42,64 @@ contract MedicalRecordAccess {
         }
     }
 
-
-
-    function grantAccess(address _patient, address payable _thirdParty) public {
+    function grantAccess(address _patient, address _thirdParty) public {
         require(msg.sender == _patient, "Only patient can grant access");
-        patients[_patient].accessList[_thirdParty] = true;
-        thirdParties[_thirdParty].patientAccessList.push(_patient);
-
-        approveAccessRequest(_patient, _thirdParty);
+        patients[_patient].accessList[_thirdParty].push(AccessInfo(_thirdParty, block.timestamp, false));
     }
 
-    function requestAccess() public {
-        Patient storage patient = patients[msg.sender];
-        require(!patient.accessList[msg.sender], "Sender already has access to records");
+    function requestAccess(address _patient) public {
+        require(!patients[_patient].accessList[msg.sender][0].status, "Sender already has access to records");
         
-        // Add access request to the patient's access requests list
-        addAccessRequest(msg.sender, block.timestamp);
+        // Add access request to the patient's access list with status as false
+        patients[_patient].accessList[msg.sender].push(AccessInfo(msg.sender, block.timestamp, false));
     }
+
+    function listAccessList() public view returns (AccessInfo[] memory) {
+        return patients[msg.sender].accessList[msg.sender];
+    }
+
+
+
+
+    function approveAccessRequest(address _thirdParty) public {
+        require(isPatient[msg.sender], "Only patient can approve access request");
+        uint index = findAccessInfoIndex(msg.sender, _thirdParty);
+        require(index != type(uint).max, "Access request not found");
+        patients[msg.sender].accessList[_thirdParty][index].status = true;
+    }
+
 
     function revokeAccess(address _thirdParty) public {
-        require(msg.sender == patients[_thirdParty].patientAddress, "Only patient can revoke access");
-        patients[_thirdParty].accessList[_thirdParty] = false;
-        for (uint i = 0; i < thirdParties[_thirdParty].patientAccessList.length; i++) {
-            if (thirdParties[_thirdParty].patientAccessList[i] == msg.sender) {
-                delete thirdParties[_thirdParty].patientAccessList[i];
-                break;
+        require(isPatient[msg.sender], "Only patient can revoke access");
+        uint index = findAccessInfoIndex(msg.sender, _thirdParty);
+        require(index != type(uint).max, "Access request not found");
+        patients[msg.sender].accessList[_thirdParty][index].status = false;
+    }
+
+
+    function findAccessInfoIndex(address _patient, address _thirdParty) internal view returns (uint) {
+        AccessInfo[] storage accessInfos = patients[_patient].accessList[_thirdParty];
+        for (uint i = 0; i < accessInfos.length; i++) {
+            if (accessInfos[i].thirdParty == _thirdParty) {
+                return i;
             }
         }
-
-        revokeAccessRequest(_thirdParty);
-    }
-
-    function approveAccessRequest(address _patient, address _thirdParty) internal {
-        patients[_patient].accessRequests[_thirdParty][patients[_patient].accessRequests[_thirdParty].length - 1].approvedDate = block.timestamp;
-        patients[_patient].accessRequests[_thirdParty][patients[_patient].accessRequests[_thirdParty].length - 1].isApproved = true;
-    }
-
-    function rejectAccessRequest(address _patient, address _thirdParty) internal {
-        delete patients[_patient].accessRequests[_thirdParty][patients[_patient].accessRequests[_thirdParty].length - 1];
-    }
-
-    function addAccessRequest(address _requester, uint _requestedDate) internal {
-        patients[msg.sender].accessRequests[_requester].push(AccessRequest(_requester, _requestedDate, 0, false));
-    }
-
-    function revokeAccessRequest(address _thirdParty) internal {
-        delete patients[msg.sender].accessRequests[_thirdParty][patients[msg.sender].accessRequests[_thirdParty].length - 1];
+        // Return maximum value of uint256 to represent "not found"
+        return type(uint).max;
     }
 
     function listAllPatients() public view returns (address[] memory) {
         return allPatients;
     }
 
-    function listMedicalRecords(address _patient) public view returns (string[] memory) {
-        require(patients[_patient].accessList[msg.sender], "Sender not authorized to access records");
+    function listPatientMedicalRecords() public view returns (string[] memory) {
+        address _patient = msg.sender;
+        require(isPatient[_patient], "Only patient can access their own medical records");
         return patients[_patient].medicalRecords;
     }
 
-    function listAccessRequests(address _patient) public view returns (AccessRequest[] memory) {
-        require(msg.sender == _patient, "Only patient can list access requests");
-        return patients[_patient].accessRequests[msg.sender];
+    function listThirdPartyMedicalRecords(address _patient) public view returns (string[] memory) {
+        require(isThirdParty[msg.sender], "Only third party can access patient's medical records");
+        return patients[_patient].medicalRecords;
     }
 }
