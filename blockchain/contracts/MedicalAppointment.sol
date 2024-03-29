@@ -6,7 +6,7 @@ import "./MedicalRecordAccess.sol"; // Import the other smart contract
 import "./DEHToken.sol";
 
 contract MedicalAppointment {
-    enum AppointmentStatus { Pending, Paid, Confirmed, ServiceProvided, AcknowledgedService, RecordReleased }
+       enum AppointmentStatus { Pending, Paid, Confirmed, ServiceProvided, AcknowledgedService, RecordReleased }
 
     struct Appointment {
         uint bookingId;
@@ -25,29 +25,52 @@ contract MedicalAppointment {
     address public hospital;
     uint private nextBookingId = 1; // Counter for generating unique booking IDs
     mapping(address => Patient) public patients;
+    address[] public patientAddresses; // Array to store patient addresses
     mapping(address => Appointment[]) public allAppointments;
     DEHToken public dehToken;
     MedicalRecordAccess public medicalRecordAccess; // Instance of the other smart contract
 
     constructor(address _hospital, address _dehTokenAddress, address _medicalRecordAccess) {
         hospital = _hospital;
-        dehToken = IERC20(_dehTokenAddress);
+        dehToken =  DEHToken(_dehTokenAddress);
         medicalRecordAccess = MedicalRecordAccess(_medicalRecordAccess); // Initialize the instance
     }
 
+    // Function to add patient address to the patientAddresses array
+    function addPatientAddress(address _patientAddress) private {
+        // Check if the patient address is not already added
+        bool exists = false;
+        for (uint i = 0; i < patientAddresses.length; i++) {
+            if (patientAddresses[i] == _patientAddress) {
+                exists = true;
+                break;
+            }
+        }
+        // If patient address does not exist, add it
+        if (!exists) {
+            patientAddresses.push(_patientAddress);
+        }
+    }
 
     function requestAppointment(uint _fee, uint _appointmentDate, string memory _appointmentSlot, string memory _name) public {
         // Check if the patient has previous appointments
         require(hasLastAppointmentRecordReleased(msg.sender), "Last appointment's status must be completed");
 
-        Patient storage patient = patients[msg.sender];
-        patient.patientAddress = msg.sender;
-        patient.name = _name;
+        // Create new patient if not exists
+        if (patients[msg.sender].patientAddress == address(0)) {
+            patients[msg.sender].patientAddress = msg.sender;
+            patients[msg.sender].name = _name;
+            patientAddresses.push(msg.sender); // Add patient address to the list
+        }
+
         uint bookingId = getNextBookingId(); // Get the next unique booking ID
-        patient.appointments.push(Appointment(bookingId, _fee, _appointmentDate, _appointmentSlot, AppointmentStatus.Pending));
-        
-        allAppointments[msg.sender].push(Appointment(bookingId, _fee, _appointmentDate, _appointmentSlot, AppointmentStatus.Pending));
+        Appointment memory newAppointment = Appointment(bookingId, _fee, _appointmentDate, _appointmentSlot, AppointmentStatus.Pending);
+
+        // Add appointment to patient's list
+        patients[msg.sender].appointments.push(newAppointment);
+        allAppointments[msg.sender].push(newAppointment);
     }
+
 
     // Internal function to check if the last appointment's status is RecordReleased
     function hasLastAppointmentRecordReleased(address _patientAddress) private view returns (bool) {
@@ -161,7 +184,7 @@ contract MedicalAppointment {
         Appointment storage latestAppointment = patient.appointments[patient.appointments.length - 1];
 
         // Ensure that the status of the latest appointment is "ServiceProvided" before releasing the record
-        require(latestAppointment.status == AppointmentStatus.ServiceProvided, "Latest appointment status must be ServiceProvided");
+        require(latestAppointment.status == AppointmentStatus.AcknowledgedService, "Latest appointment status must be AcknowledgedService");
 
         // Calculate the half fee
         uint halfFee = latestAppointment.fee / 2;
@@ -182,23 +205,32 @@ contract MedicalAppointment {
 
 
 
-    function getAllAppointments() public view returns (Appointment[] memory) {
-        // Ensure that the message sender is the hospital
-        require(msg.sender == hospital, "Only hospital can access all appointments");
+function getAllAppointments() public view returns (Appointment[] memory) {
+    // Ensure that the message sender is the hospital
+    require(msg.sender == hospital, "Only hospital can access all appointments");
 
-        // Create a dynamic array to store all appointments
-        Appointment[] memory allAppointmentsCombined;
-
-        // Iterate through all patients and concatenate their appointments
-        for (uint i = 0; i < allPatients.length; i++) {
-            Patient storage patient = patients[allPatients[i]];
-            for (uint j = 0; j < patient.appointments.length; j++) {
-                allAppointmentsCombined.push(patient.appointments[j]);
-            }
-        }
-
-        return allAppointmentsCombined;
+    // Calculate the total number of appointments
+    uint totalAppointments;
+    for (uint i = 0; i < patientAddresses.length; i++) {
+        totalAppointments += patients[patientAddresses[i]].appointments.length;
     }
+
+    // Create a dynamic array to store all appointments
+    Appointment[] memory allAppointmentsCombined = new Appointment[](totalAppointments);
+    uint index = 0;
+
+    // Iterate through all patient addresses and concatenate their appointments
+    for (uint i = 0; i < patientAddresses.length; i++) {
+        address patientAddress = patientAddresses[i];
+        Patient storage patient = patients[patientAddress];
+        for (uint j = 0; j < patient.appointments.length; j++) {
+            allAppointmentsCombined[index++] = patient.appointments[j];
+        }
+    }
+
+    return allAppointmentsCombined;
+}
+
 
 
     function getPatientAppointments(address _patientAddress) public view returns (Appointment[] memory) {

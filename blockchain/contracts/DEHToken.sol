@@ -10,36 +10,42 @@ contract DEHToken is IERC20 {
     uint private constant __totalSupply = 10000;
     mapping (address => uint) private __balanceOf;
     mapping (address => mapping (address => uint)) private __allowances;
+
     constructor() {
-            __balanceOf[msg.sender] = __totalSupply;
     }
-    function totalSupply() public pure override returns (uint _totalSupply) { _totalSupply = __totalSupply;
+
+    function totalSupply() public pure override returns (uint _totalSupply) {
+        return __totalSupply;
     }
-    function balanceOf(address _addr) public view override returns (uint
-    balance) {
+
+    function balanceOf(address _addr) public view override returns (uint balance) {
         return __balanceOf[_addr];
     }
-    function transfer(address _to, uint _value) public override returns (bool
-    success) {
-        if (_value > 0 && _value <= balanceOf(msg.sender)) {
-            __balanceOf[msg.sender] -= _value;
-            __balanceOf[_to] += _value;
-            return true;
+
+    function transfer(address _to, uint _value) public override returns (bool success) {
+        require(_value > 0 && _value <= balanceOf(msg.sender), "Insufficient balance");
+        
+        __balanceOf[msg.sender] -= _value;
+        __balanceOf[_to] += _value;
+        emit Transfer(msg.sender, _to, _value);
+        return true;
     }
-        return false;
-    }
+
     function transferFrom(address _from, address _to, uint _value) public override returns (bool success) {
-        if (__allowances[_from][msg.sender] > 0 &&
-            _value > 0 &&
-            __allowances[_from][msg.sender] >= _value &&
-            __balanceOf[_from] >= _value) {
-            __balanceOf[_from] -= _value;
-            __balanceOf[_to] += _value;
-             __allowances[_from][msg.sender] -= _value;
-            return true;
+        require(_value > 0 && _value <= balanceOf(_from), "Insufficient balance");
+        
+        __balanceOf[_from] -= _value;
+        __balanceOf[_to] += _value;
+        emit Transfer(_from, _to, _value);
+        return true;
     }
-        return false;
+
+    function mint(address _to, uint _amount) public {
+        require(_to != address(0), "Mint to the zero address");
+        __balanceOf[_to] += _amount;
+        emit Transfer(address(0), _to, _amount);
     }
+
     function approve(address _spender, uint _value) public override returns
     (bool success) {
         __allowances[msg.sender][_spender] = _value;
