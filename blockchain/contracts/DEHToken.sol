@@ -8,10 +8,12 @@ contract DEHToken is IERC20 {
     string public constant name = "DEH Token";
     uint8 public constant decimals = 0;
     uint private constant __totalSupply = 10000;
+    uint private availableTokens;
     mapping (address => uint) private __balanceOf;
     mapping (address => mapping (address => uint)) private __allowances;
 
     constructor() {
+        availableTokens=0;
     }
 
     function totalSupply() public pure override returns (uint _totalSupply) {
@@ -42,7 +44,9 @@ contract DEHToken is IERC20 {
 
     function mint(address _to, uint _amount) public {
         require(_to != address(0), "Mint to the zero address");
+        require(availableTokens+_amount <= __totalSupply, "Maximum Tokens Reached");
         __balanceOf[_to] += _amount;
+        availableTokens += _amount;
         emit Transfer(address(0), _to, _amount);
     }
 
