@@ -139,7 +139,7 @@ const App: React.FC = () => {
                     }}>
                         <Option value="Role 1">Patient</Option>
                         <Option value="Role 2">Hospital</Option>
-                        <Option value="Role 3">Thirt Party</Option>
+                        <Option value="Role 3">Third Party</Option>
                     </Select>
                 </div>
             </Header>

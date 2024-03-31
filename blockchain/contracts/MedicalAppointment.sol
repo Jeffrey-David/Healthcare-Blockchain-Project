@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity >=0.5.10;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./MedicalRecordAccess.sol"; // Import the other smart contract
@@ -11,7 +11,7 @@ contract MedicalAppointment {
     struct Appointment {
         uint bookingId;
         uint fee;
-        uint appointmentDate;
+        string appointmentDate;
         string appointmentSlot;
         AppointmentStatus status;
     }
@@ -29,7 +29,6 @@ contract MedicalAppointment {
     mapping(address => Appointment[]) public allAppointments;
     DEHToken public dehToken;
     MedicalRecordAccess public medicalRecordAccess; // Instance of the other smart contract
-
     constructor(address _hospital, address _dehTokenAddress, address _medicalRecordAccess) {
         hospital = _hospital;
         dehToken =  DEHToken(_dehTokenAddress);
@@ -52,7 +51,7 @@ contract MedicalAppointment {
         }
     }
 
-    function requestAppointment(uint _fee, uint _appointmentDate, string memory _appointmentSlot, string memory _name) public {
+    function requestAppointment(uint _fee, string memory _appointmentDate, string memory _appointmentSlot, string memory _name) public {
         // Check if the patient has previous appointments
         require(hasLastAppointmentRecordReleased(msg.sender), "Last appointment's status must be completed");
 
