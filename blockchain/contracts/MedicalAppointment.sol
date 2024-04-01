@@ -9,6 +9,8 @@ contract MedicalAppointment {
        enum AppointmentStatus { Pending, Paid, Confirmed, ServiceProvided, AcknowledgedService, RecordReleased }
 
     struct Appointment {
+        address patientAddresses;
+        string name;
         uint bookingId;
         uint fee;
         string appointmentDate;
@@ -52,8 +54,6 @@ contract MedicalAppointment {
     }
 
     function requestAppointment(uint _fee, string memory _appointmentDate, string memory _appointmentSlot, string memory _name) public {
-        // Check if the patient has previous appointments
-        require(hasLastAppointmentRecordReleased(msg.sender), "Last appointment's status must be completed");
 
         // Create new patient if not exists
         if (patients[msg.sender].patientAddress == address(0)) {
@@ -62,8 +62,12 @@ contract MedicalAppointment {
             patientAddresses.push(msg.sender); // Add patient address to the list
         }
 
+        else {
+        require(patients[msg.sender].appointments.length == 0 || hasLastAppointmentRecordReleased(msg.sender), "Last appointment's status must be completed and released");
+        }
+
         uint bookingId = getNextBookingId(); // Get the next unique booking ID
-        Appointment memory newAppointment = Appointment(bookingId, _fee, _appointmentDate, _appointmentSlot, AppointmentStatus.Pending);
+        Appointment memory newAppointment = Appointment(msg.sender, _name,  bookingId, _fee, _appointmentDate, _appointmentSlot, AppointmentStatus.Pending);
 
         // Add appointment to patient's list
         patients[msg.sender].appointments.push(newAppointment);
@@ -222,6 +226,7 @@ function getAllAppointments() public view returns (Appointment[] memory) {
     for (uint i = 0; i < patientAddresses.length; i++) {
         address patientAddress = patientAddresses[i];
         Patient storage patient = patients[patientAddress];
+
         for (uint j = 0; j < patient.appointments.length; j++) {
             allAppointmentsCombined[index++] = patient.appointments[j];
         }
@@ -232,7 +237,7 @@ function getAllAppointments() public view returns (Appointment[] memory) {
 
 
 
-    function getPatientAppointments(address _patientAddress) public view returns (Appointment[] memory) {
-        return patients[_patientAddress].appointments;
+    function getPatientAppointments() public view returns (Appointment[] memory) {
+        return patients[msg.sender].appointments;
     }
 }

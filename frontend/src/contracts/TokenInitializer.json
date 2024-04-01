@@ -23,7 +23,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -1628,15 +1629,15 @@
         77
       ],
       "TokenInitializer": [
-        1471
+        1487
       ]
     },
-    "id": 1472,
+    "id": 1488,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1442,
+        "id": 1458,
         "literals": [
           "solidity",
           ">=",
@@ -1649,10 +1650,10 @@
       {
         "absolutePath": "project:/contracts/DEHToken.sol",
         "file": "./DEHToken.sol",
-        "id": 1443,
+        "id": 1459,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 1472,
+        "scope": 1488,
         "sourceUnit": 316,
         "src": "66:24:5",
         "symbolAliases": [],
@@ -1665,9 +1666,9 @@
         "contractDependencies": [],
         "contractKind": "contract",
         "fullyImplemented": true,
-        "id": 1471,
+        "id": 1487,
         "linearizedBaseContracts": [
-          1471
+          1487
         ],
         "name": "TokenInitializer",
         "nameLocation": "103:16:5",
@@ -1676,12 +1677,12 @@
           {
             "constant": false,
             "functionSelector": "6408b4a5",
-            "id": 1446,
+            "id": 1462,
             "mutability": "mutable",
             "name": "dehToken",
             "nameLocation": "143:8:5",
             "nodeType": "VariableDeclaration",
-            "scope": 1471,
+            "scope": 1487,
             "src": "127:24:5",
             "stateVariable": true,
             "storageLocation": "default",
@@ -1690,10 +1691,10 @@
               "typeString": "contract DEHToken"
             },
             "typeName": {
-              "id": 1445,
+              "id": 1461,
               "nodeType": "UserDefinedTypeName",
               "pathNode": {
-                "id": 1444,
+                "id": 1460,
                 "name": "DEHToken",
                 "nodeType": "IdentifierPath",
                 "referencedDeclaration": 315,
@@ -1710,23 +1711,23 @@
           },
           {
             "body": {
-              "id": 1457,
+              "id": 1473,
               "nodeType": "Block",
               "src": "198:56:5",
               "statements": [
                 {
                   "expression": {
-                    "id": 1455,
+                    "id": 1471,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
-                      "id": 1451,
+                      "id": 1467,
                       "name": "dehToken",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1446,
+                      "referencedDeclaration": 1462,
                       "src": "209:8:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_contract$_DEHToken_$315",
@@ -1738,11 +1739,11 @@
                     "rightHandSide": {
                       "arguments": [
                         {
-                          "id": 1453,
+                          "id": 1469,
                           "name": "_dehTokenAddress",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1448,
+                          "referencedDeclaration": 1464,
                           "src": "229:16:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
@@ -1757,7 +1758,7 @@
                             "typeString": "address"
                           }
                         ],
-                        "id": 1452,
+                        "id": 1468,
                         "name": "DEHToken",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
@@ -1768,7 +1769,7 @@
                           "typeString": "type(contract DEHToken)"
                         }
                       },
-                      "id": 1454,
+                      "id": 1470,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -1789,13 +1790,13 @@
                       "typeString": "contract DEHToken"
                     }
                   },
-                  "id": 1456,
+                  "id": 1472,
                   "nodeType": "ExpressionStatement",
                   "src": "209:37:5"
                 }
               ]
             },
-            "id": 1458,
+            "id": 1474,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [],
@@ -1803,17 +1804,17 @@
             "nameLocation": "-1:-1:-1",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1449,
+              "id": 1465,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1448,
+                  "id": 1464,
                   "mutability": "mutable",
                   "name": "_dehTokenAddress",
                   "nameLocation": "180:16:5",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1458,
+                  "scope": 1474,
                   "src": "172:24:5",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1822,7 +1823,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1447,
+                    "id": 1463,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "172:7:5",
@@ -1838,12 +1839,12 @@
               "src": "171:26:5"
             },
             "returnParameters": {
-              "id": 1450,
+              "id": 1466,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "198:0:5"
             },
-            "scope": 1471,
+            "scope": 1487,
             "src": "160:94:5",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -1851,7 +1852,7 @@
           },
           {
             "body": {
-              "id": 1469,
+              "id": 1485,
               "nodeType": "Block",
               "src": "295:90:5",
               "statements": [
@@ -1860,7 +1861,7 @@
                     "arguments": [
                       {
                         "expression": {
-                          "id": 1464,
+                          "id": 1480,
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
@@ -1871,7 +1872,7 @@
                             "typeString": "msg"
                           }
                         },
-                        "id": 1465,
+                        "id": 1481,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -1886,7 +1887,7 @@
                       },
                       {
                         "hexValue": "313030",
-                        "id": 1466,
+                        "id": 1482,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -1913,18 +1914,18 @@
                         }
                       ],
                       "expression": {
-                        "id": 1461,
+                        "id": 1477,
                         "name": "dehToken",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1446,
+                        "referencedDeclaration": 1462,
                         "src": "347:8:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_contract$_DEHToken_$315",
                           "typeString": "contract DEHToken"
                         }
                       },
-                      "id": 1463,
+                      "id": 1479,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -1938,7 +1939,7 @@
                         "typeString": "function (address,uint256) external"
                       }
                     },
-                    "id": 1467,
+                    "id": 1483,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1953,14 +1954,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1468,
+                  "id": 1484,
                   "nodeType": "ExpressionStatement",
                   "src": "347:30:5"
                 }
               ]
             },
             "functionSelector": "2f88236a",
-            "id": 1470,
+            "id": 1486,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -1968,25 +1969,25 @@
             "nameLocation": "271:14:5",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1459,
+              "id": 1475,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "285:2:5"
             },
             "returnParameters": {
-              "id": 1460,
+              "id": 1476,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "295:0:5"
             },
-            "scope": 1471,
+            "scope": 1487,
             "src": "262:123:5",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 1472,
+        "scope": 1488,
         "src": "94:294:5",
         "usedErrors": []
       }
@@ -2001,12 +2002,13 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x3c3f239564aa754BdFbc833b1e3A3B652220099d",
-      "transactionHash": "0x11a0b6de47efe368e274509118e34877fa5615295e697157be42174d1af8a8e7"
+      "address": "0xCC82AB247C9E49929E2016fF07e5C7A98a9923CB",
+      "transactionHash": "0x680ffb25742056cae328ca8f65848acc2354d7a24576229bb6cd69305f758c7f"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2024-04-01T09:53:22.505Z",
+  "updatedAt": "2024-04-01T12:57:22.701Z",
+  "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
     "methods": {},

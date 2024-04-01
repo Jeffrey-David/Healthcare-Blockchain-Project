@@ -19,12 +19,13 @@
 
 // getBrokers();
 
+
 const { ethers } = require('ethers');
 const DEHTokenBuild = require('./contracts/DEHToken.json');
 
 const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545'); // Replace with your Ganache URL
 const signer = provider.getSigner();
-//console.log('0x62a73044C6eC898954f4000CFf5B1bA20C20D96b', DEHTokenBuild.abi, signer);
+
 const DEHTokenContract = new ethers.Contract('0x62a73044C6eC898954f4000CFf5B1bA20C20D96b', DEHTokenBuild.abi, signer);
 
 const getBrokers = async () => {
