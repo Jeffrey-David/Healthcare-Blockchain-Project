@@ -4,6 +4,7 @@ require("dotenv").config({path:"../../../.env"})
 const DEHTokenBuild = require('../contracts/DEHToken.json');
 
 const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545'); // Replace with your Ganache URL
+//const provider = new ethers.providers.Web3Provider(window.ethereum);
 const signer = provider.getSigner();
 const DEHTokenContract = new ethers.Contract(process.env.DEHTOKEN_CONTRACT_ADDRESS, DEHTokenBuild.abi, signer);
 
@@ -60,7 +61,7 @@ async function callAllowance(owner, spender) {
 
 // callTransferFrom('0x66ADaFa0c3fc957D703f19309FCd00329cCd6A65', '0xC379e80660235B77642dA73f0d4D3b0A7dD92158', 300)
 
-callMint('0xe5440AB020c4Ac92768f21db488A359A386ed206', 100);
-callBalanceOf('0xe5440AB020c4Ac92768f21db488A359A386ed206');
+//callMint('0x858ef375635A9Ca42d1e0a692dEFF09c2fF92B8E', 100);
+//callBalanceOf('0x858ef375635A9Ca42d1e0a692dEFF09c2fF92B8E');
 
-// callBalanceOf('0x66ADaFa0c3fc957D703f19309FCd00329cCd6A65');
+//callBalanceOf('0xe5440AB020c4Ac92768f21db488A359A386ed206');

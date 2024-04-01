@@ -21,6 +21,7 @@ contract MedicalAppointment {
     struct Patient {
         address patientAddress;
         string name;
+        uint age;
         Appointment[] appointments;
     }
 
@@ -53,12 +54,13 @@ contract MedicalAppointment {
         }
     }
 
-    function requestAppointment(uint _fee, string memory _appointmentDate, string memory _appointmentSlot, string memory _name) public {
+    function requestAppointment(uint _fee, string memory _appointmentDate, string memory _appointmentSlot, string memory _name, uint _age) public {
 
         // Create new patient if not exists
         if (patients[msg.sender].patientAddress == address(0)) {
             patients[msg.sender].patientAddress = msg.sender;
             patients[msg.sender].name = _name;
+            patients[msg.sender].age = _age;
             patientAddresses.push(msg.sender); // Add patient address to the list
         }
 
@@ -180,6 +182,7 @@ contract MedicalAppointment {
 
         // Find the patient and ensure that the patient exists and has appointments
         Patient storage patient = patients[_patientAddress];
+        uint age = patient.age;
         require(patient.patientAddress != address(0), "Patient not found");
         require(patient.appointments.length > 0, "Patient has no appointments");
 
@@ -190,7 +193,7 @@ contract MedicalAppointment {
         require(latestAppointment.status == AppointmentStatus.AcknowledgedService, "Latest appointment status must be AcknowledgedService");
 
         // Calculate the half fee
-        uint halfFee = latestAppointment.fee / 2;
+        uint halfFee = latestAppointment.fee;
 
         // Transfer half of the fee to the hospital
         require(dehToken.transfer(hospital, halfFee), "Token transfer to hospital failed");
@@ -199,7 +202,7 @@ contract MedicalAppointment {
         latestAppointment.status = AppointmentStatus.RecordReleased;
 
         // Call the storeRecord function from the MedicalRecordAccess contract to store the medical record
-        medicalRecordAccess.storeRecord(_patientAddress, patient.name, _medicalRecord);
+        medicalRecordAccess.storeRecord(_patientAddress, patient.name, _medicalRecord, age, latestAppointment.appointmentDate);
 
         // Transfer half of the fee to the patient
         require(dehToken.transfer(_patientAddress, halfFee), "Token transfer to patient failed");
