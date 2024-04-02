@@ -1,7 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Breadcrumb, Layout, Menu, theme, Select, Typography, Table, Button, Modal} from 'antd';
 import logo from './logo-main.svg';
+
+import {
+    callStoreRecord,
+    callGrantAccess,
+    callRequestAccess,
+    callRevokeAccess,
+    callListAccessList,
+    callGetAccessRequests,
+    callGetMedicalRecords,
+    getAddress
+} from './contractAPIs/MedicalRecordAccess.js';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -38,9 +49,9 @@ const App: React.FC = () => {
             key: 'address',
         },
         {
-            title: 'Latest Appointment Date',
-            dataIndex: 'latestAppointmentDate',
-            key: 'latestAppointmentDate',
+            title: 'Date',
+            dataIndex: 'date',
+            key: 'date',
         },
         {
             title: 'Detail',
@@ -51,40 +62,94 @@ const App: React.FC = () => {
             title: 'Action',
             key: 'action',
             render: (text, record) => (
-                <Button type="default" onClick={() => { setVisible(true); setCurrentRecord(record); }}>Detail</Button>
+                <Button type="default" onClick={() => { setCurrentRecord(record); console.log(record); setVisible(true); }}>Detail</Button>
             ),
         },
     ];
 
-    const data = [
-        {
-            key: '1',
-            no: '1',
-            fullName: 'John Doe',
-            age: 32,
-            address: 'New York No. 1 Lake Park',
-            latestAppointmentDate: '2022-01-04',
-            detailMedicalRecord: 'This is a dummy medical record for John Doe.',
-        },
-        {
-            key: '2',
-            no: '2',
-            fullName: 'John Doe',
-            age: 32,
-            address: 'New York No. 1 Lake Park',
-            latestAppointmentDate: '2022-01-03',
-            detailMedicalRecord: 'This is another dummy medical record for John Doe.',
-        },
-        {
-            key: '3',
-            no: '3',
-            fullName: 'John Doe',
-            age: 32,
-            address: 'New York No. 1 Lake Park',
-            latestAppointmentDate: '2022-01-02',
-            detailMedicalRecord: 'This is yet another dummy medical record for John Doe.',
-        },
-    ];
+    // const data = [
+    //     {
+    //         key: '1',
+    //         no: '1',
+    //         fullName: 'John Doe',
+    //         age: 32,
+    //         address: 'New York No. 1 Lake Park',
+    //         latestAppointmentDate: '2022-01-04',
+    //         detailMedicalRecord: 'This is a dummy medical record for John Doe.',
+    //     },
+    //     {
+    //         key: '2',
+    //         no: '2',
+    //         fullName: 'John Doe',
+    //         age: 32,
+    //         address: 'New York No. 1 Lake Park',
+    //         latestAppointmentDate: '2022-01-03',
+    //         detailMedicalRecord: 'This is another dummy medical record for John Doe.',
+    //     },
+    //     {
+    //         key: '3',
+    //         no: '3',
+    //         fullName: 'John Doe',
+    //         age: 32,
+    //         address: 'New York No. 1 Lake Park',
+    //         latestAppointmentDate: '2022-01-02',
+    //         detailMedicalRecord: 'This is yet another dummy medical record for John Doe.',
+    //     },
+    // ];
+
+
+
+
+
+    const [data, setData] = useState([]); // Initialize data state with an empty array
+    const [refresh, setRefresh] = useState(true); // State to trigger data refresh
+    
+    useEffect(() => {
+        const fetchData = async () => {
+            if (refresh) {
+                try {
+                    let patientAddress = 0;
+                    const add = await getAddress().then(address => {
+                        patientAddress = address;
+                    });
+                    const contractData = await callGetMedicalRecords(patientAddress);
+                    console.log(contractData);
+                    const dates = contractData[3];
+                    console.log(dates);
+                    const medicalRecords = contractData[4];
+                    // patient.patientAddress, patient.name, patient.age, patient.date, patient.medicalRecords
+                    const formattedData = medicalRecords.map((item, index) => ({
+                        key: index+1,
+                        No: index + 1,
+                        fullName: contractData[1],
+                        age: contractData[2].toNumber(),
+                        address: patientAddress,
+                        date: dates[index],
+                        detailMedicalRecord: item
+                    }));
+                    setData(formattedData); // Update the state with the formatted data
+
+    
+                   setRefresh(false); // Reset the refresh state
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            }
+        };
+
+    
+        fetchData(); // Call the fetchData function
+        setRefresh(false);
+    }, [refresh]); 
+
+    function handleRefresh() {
+        // Set the refresh state to true to trigger data fetching
+        setRefresh(true);
+    }
+    
+
+
+
 
     const [visible, setVisible] = useState(false);
     const [currentRecord, setCurrentRecord] = useState(null);

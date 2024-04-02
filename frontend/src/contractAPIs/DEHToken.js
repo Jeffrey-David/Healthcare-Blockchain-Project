@@ -3,9 +3,9 @@ const DEHTOKEN_CONTRACT_ADDRESS="0xe25eA8C33A0E0e0fA83FFcC16a49B061Bf8A91BC"
 
 const DEHTokenBuild = require('../contracts/DEHToken.json');
 
-const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545'); // Replace with your Ganache URL
-//const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner(1);
+//const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545'); // Replace with your Ganache URL
+const provider = new ethers.providers.Web3Provider(window.ethereum);
+const signer = provider.getSigner();
 const DEHTokenContract = new ethers.Contract(DEHTOKEN_CONTRACT_ADDRESS, DEHTokenBuild.abi, signer);
 
 // Call totalSupply function

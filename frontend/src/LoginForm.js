@@ -8,7 +8,22 @@ const { Title } = Typography;
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const handleClick = () => {
+  const handleClick = async () => {
+    try {
+      // Prompt the user to connect their MetaMask wallet
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      
+      // Handle the connected accounts
+      const selectedAccount = accounts[0];
+      console.log('Connected account:', selectedAccount);
+      
+      // Perform further actions after successful connection
+      // For example, you can fetch the user's balance or perform other Ethereum transactions
+      
+    } catch (error) {
+      // Handle errors
+      console.error('Error connecting to MetaMask:', error);
+    }
     navigate('/patient');
   };
 

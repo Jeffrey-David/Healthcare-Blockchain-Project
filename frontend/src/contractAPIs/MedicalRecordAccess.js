@@ -3,9 +3,9 @@ const MEDICALRECORDACCESS_CONTRACT_ADDRESS="0x391b5b4C79301EB09e714D98D3791E9500
 
 const MedicalRecordAccessBuild = require('../contracts/MedicalRecordAccess.json');
 
-const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545'); // Replace with your Ganache URL
-//const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner(2);
+//const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545'); // Replace with your Ganache URL
+const provider = new ethers.providers.Web3Provider(window.ethereum);
+const signer = provider.getSigner();
 const MedicalRecordAccessContract = new ethers.Contract(MEDICALRECORDACCESS_CONTRACT_ADDRESS, MedicalRecordAccessBuild.abi, signer);
 
 
@@ -61,6 +61,23 @@ async function callGetMedicalRecords(patientAddress) {
     return records;
 };
 
+async function getAddress() {
+    const address = await signer.getAddress().then(console.log('done'));
+    return address;
+}
+
+
+module.exports = {
+    callStoreRecord,
+    callGrantAccess,
+    callRequestAccess,
+    callRevokeAccess,
+    callListAccessList,
+    callGetAccessRequests,
+    callGetMedicalRecords,
+    getAddress
+}
+
 
 //callStoreRecord('0x858ef375635A9Ca42d1e0a692dEFF09c2fF92B8E', "John", "Dummy",21, '21-02-2022');  //2nd Address
 //callStoreRecord('0x54c39202d9689e7fDFea05ba712E86D992bC931d', "Jeff", "Dummy",22, '02-05-2022');
@@ -70,6 +87,13 @@ async function callGetMedicalRecords(patientAddress) {
 // callRevokeAccess('0xc82098A69E92e4A4484C42e01b9Cb67115a177eC');
 //callListAccessList();
 //callGetAccessRequests();
+
+// const add = getAddress().then(address => {
+//     console.log(address);
+// });
+
+// console.log(add);
+
 
 
 
