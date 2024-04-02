@@ -59,15 +59,14 @@ contract MedicalAppointment {
         // Create new patient if not exists
         if (patients[msg.sender].patientAddress == address(0)) {
             patients[msg.sender].patientAddress = msg.sender;
-            patients[msg.sender].name = _name;
-            patients[msg.sender].age = _age;
             patientAddresses.push(msg.sender); // Add patient address to the list
         }
 
         else {
         require(patients[msg.sender].appointments.length == 0 || hasLastAppointmentRecordReleased(msg.sender), "Last appointment's status must be completed and released");
         }
-
+        patients[msg.sender].name = _name;
+        patients[msg.sender].age = _age;
         uint bookingId = getNextBookingId(); // Get the next unique booking ID
         Appointment memory newAppointment = Appointment(msg.sender, _name,  bookingId, _fee, _appointmentDate, _appointmentSlot, AppointmentStatus.Pending);
 
@@ -242,5 +241,12 @@ function getAllAppointments() public view returns (Appointment[] memory) {
 
     function getPatientAppointments() public view returns (Appointment[] memory) {
         return patients[msg.sender].appointments;
+    }
+
+    function getPatientDetails(address patientAddress) public view returns (string memory, uint) {
+        // Retrieve patient details using their address
+        Patient memory patient = patients[patientAddress];
+        // Return name and age of the patient
+        return (patient.name, patient.age);
     }
 }

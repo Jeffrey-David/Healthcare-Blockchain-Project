@@ -1,12 +1,12 @@
 const { ethers } = require('ethers');
-require("dotenv").config({path:"../../../.env"})
+const MEDICALRECORDACCESS_CONTRACT_ADDRESS="0x391b5b4C79301EB09e714D98D3791E95006D7330"
 
 const MedicalRecordAccessBuild = require('../contracts/MedicalRecordAccess.json');
 
 const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545'); // Replace with your Ganache URL
 //const provider = new ethers.providers.Web3Provider(window.ethereum);
 const signer = provider.getSigner(2);
-const MedicalRecordAccessContract = new ethers.Contract(process.env.MEDICALRECORDACCESS_CONTRACT_ADDRESS, MedicalRecordAccessBuild.abi, signer);
+const MedicalRecordAccessContract = new ethers.Contract(MEDICALRECORDACCESS_CONTRACT_ADDRESS, MedicalRecordAccessBuild.abi, signer);
 
 
 // function storeRecord(address _patientAddress, string memory _patientName, string memory _medicalRecord, uint age, string memory _date)

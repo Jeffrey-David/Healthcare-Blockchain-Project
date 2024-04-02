@@ -1,8 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Breadcrumb, Layout, Menu, theme, Select, Typography, Table, Tag, Button, Modal, Form, DatePicker } from 'antd';
+import { Breadcrumb, Layout, Menu, theme, Select, Typography, Table, Tag, Button, Modal, Form, DatePicker, Input } from 'antd';
 import logo from './logo-main.svg';
 import { PlusOutlined } from '@ant-design/icons';
+import { 
+    callRequestAppointment,
+    callPayAppointmentfee,
+    callConfirmAppointment,
+    callProvideService,
+    callAcknowledgeService,
+    callReleaseMedicalRecord,
+    callGetAllAppointments,
+    callGetPatientAppointments,
+    callGetPatientDetails
+  } from './contractAPIs/MedicalAppointment.js';
+
+  import { callRechargeTokens } from './contractAPIs/TokenInitializer.js';
+  import { callBalanceOf } from './contractAPIs/DEHToken.js';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -10,13 +24,16 @@ const { Header, Content, Sider } = Layout;
 const { SubMenu } = Menu;
 
 
-
 const App: React.FC = () => {
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
     const navigate = useNavigate();
-
+    let identity = {
+        fullName: 'John Doe',
+        age: '35',
+        address: 'Orchard Street 69',
+    };
     const columns = [
         {
             title: 'No',
@@ -59,14 +76,39 @@ const App: React.FC = () => {
             render: (text, record) => {
                 let buttonText = 'Detail';
                 let buttonAction = () => { setVisible(true); setCurrentRecord(record); };
-                if (record.status === 'Waiting for Confirmation') {
-                    buttonText = 'Confirm Treatment';
+                if (record.status === 'Pending Payment') {
+                    buttonText = 'Pay Appointment Fee';
                     buttonAction = () => {
                         Modal.confirm({
-                            title: 'Confirm Treatment',
-                            content: 'Are you sure you want to confirm this treatment?',
+                            title: 'Pay Appointment Fee',
+                            content: 'Are you sure you want to pay?\nDouble the fee will be paid and the remaining will get back along with medical record',
                             onOk() {
-                                // Handle the confirmation action here
+                                callPayAppointmentfee().then(() => {
+                                    // Call the refresh function after the payment is done
+                                    handleRefresh();
+                                }).catch(error => {
+                                    console.error("Error paying appointment fee:", error);
+                                });
+                            },
+                            onCancel() {
+                                // Handle the cancellation action here
+                            },
+                        });
+                    };
+                }
+                else if (record.status === 'Service Provided') {
+                    buttonText = 'Acknowledge Service';
+                    buttonAction = () => {
+                        Modal.confirm({
+                            title: 'Acknowledge Service',
+                            content: 'Are you sure you want to acknowledge that service was provided?',
+                            onOk() {
+                                callAcknowledgeService().then(() => {
+                                    // Call the refresh function after the payment is done
+                                    handleRefresh();
+                                }).catch(error => {
+                                    console.error("Error Acknowledging Service:", error);
+                                });
                             },
                             onCancel() {
                                 // Handle the cancellation action here
@@ -81,45 +123,175 @@ const App: React.FC = () => {
             },
         },
     ];
+    const [data, setData] = useState([]); // Initialize data state with an empty array
+    const [refresh, setRefresh] = useState(true); // State to trigger data refresh
+    const [balance, setBalance] = useState(0);
+    const [name, setName] = useState('');
+    const [age, setAge] = useState(0);
 
-    const data = [
-        {
-            key: '1',
-            no: '1',
-            bookingId: 'BID123',
-            bookingFee: '20 DEH',
-            appointmentDate: '2022-01-01',
-            appointmentSlot: '10:00 - 11:00',
-            status: 'Approved',
-        },
-        {
-            key: '2',
-            no: '2',
-            bookingId: 'BID231',
-            bookingFee: '20 DEH',
-            appointmentDate: '2022-01-02',
-            appointmentSlot: '11:00 - 12:00',
-            status: 'Waiting for Approval',
-        },
-        {
-            key: '1',
-            no: '1',
-            bookingId: 'BID332',
-            bookingFee: '20 DEH',
-            appointmentDate: '2022-01-03',
-            appointmentSlot: '12:00 - 13:00',
-            status: 'Waiting for Confirmation',
-        },
-    ];
+    // useEffect(() => {
+    //     const fetchPatientDetails = async () => {
+    //         try {
+    //             const contractData = await callGetPatientAppointments();
+    //             const address = contractData[0][0];
+    //             const details = await callGetPatientDetails(address);
+    //             setName(details[0]);
+    //             setAge(details[1].toNumber());
+    //             console.log(details[0],details[1]);
+    //         } catch (error) {
+    //             console.error('Error fetching patient details:', error);
+    //         }
+    //     };
+    //     fetchPatientDetails();
+    //     console.log(name, age);
+    //             // Cleanup function if needed
+    //             return () => {
+    //                 // Any cleanup code
+    //             };
+    //         }, [[refresh]]);
+
+        
+
+    let address;
+    useEffect(() => {
+        const fetchData = async () => {
+            if (refresh) {
+                try {
+                    const contractData = await callGetPatientAppointments();
+                    address = contractData[0][0];
+                    console.log(address);
+                    const formattedData = contractData.map((item, index) => ({
+                        key: (index + 1).toString(),
+                        no: (index + 1).toString(),
+                        bookingId: item[2], // Assuming this is the patient address
+                        bookingFee: item[3] + ' DEH', // Assuming this is the fee
+                        appointmentDate: item[4], // Assuming this is the appointment date
+                        appointmentSlot: item[5], // Assuming this is the appointment slot
+                        status: getStatus(item[6]) // Assuming this is the status code
+                    }));
+                    setData(formattedData); // Update the state with the formatted data
+
+                    const fetchPatientDetails = async () => {
+                        try {
+                            const contractData = await callGetPatientAppointments();
+                            const address = contractData[0][0];
+                            const details = await callGetPatientDetails(address);
+                            setName(details[0]);
+                            setAge(details[1].toNumber());
+                            console.log(details[0],details[1]);
+                        } catch (error) {
+                            console.error('Error fetching patient details:', error);
+                        }
+                    };
+                    fetchPatientDetails();
+    
+                    // Fetch balance only if address is available
+                    if (address) {
+                        const balance = await callBalanceOf(address);
+                        setBalance(balance); // Update the balance state with the fetched balance value
+                        // const details = await callGetPatientDetails(address);
+                        // name =  details[0];
+                        // age = details[1].toNumber();
+                        // console.log(identity.fullName);
+                    }
+    
+                   setRefresh(false); // Reset the refresh state
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            }
+        };
+
+    
+        fetchData(); // Call the fetchData function
+        setRefresh(false);
+    }, [refresh]); 
+    function handleRechargeTokens() {
+        callRechargeTokens().then(handleRefresh);
+    }
+    function handleRefresh() {
+        // Set the refresh state to true to trigger data fetching
+        setRefresh(true);
+    }
+
+
+      
+      function getStatus(statusCode) {
+        switch (statusCode) {
+            case 0:
+                return 'Pending Payment';
+            case 1:
+                return 'Paid';
+            case 2:
+                return 'Confirmed';
+            case 3:
+                return 'Service Provided';          
+            case 4:
+                return 'Acknowledged Service';
+            case 5:
+                return 'Record Released';
+          // Add more cases if needed
+          default:
+            return 'Unknown';
+        }
+      }
+
+    // const data = [
+    //     {
+    //         key: '1',
+    //         no: '1',
+    //         bookingId: 'BID123',
+    //         bookingFee: '20 DEH',
+    //         appointmentDate: '2022-01-01',
+    //         appointmentSlot: '10:00 - 11:00',
+    //         status: 'Approved',
+    //     },
+    //     {
+    //         key: '2',
+    //         no: '2',
+    //         bookingId: 'BID231',
+    //         bookingFee: '20 DEH',
+    //         appointmentDate: '2022-01-02',
+    //         appointmentSlot: '11:00 - 12:00',
+    //         status: 'Waiting for Approval',
+    //     },
+    //     {
+    //         key: '1',
+    //         no: '1',
+    //         bookingId: 'BID332',
+    //         bookingFee: '20 DEH',
+    //         appointmentDate: '2022-01-03',
+    //         appointmentSlot: '12:00 - 13:00',
+    //         status: 'Waiting for Confirmation',
+    //     },
+    // ];
 
     const [visible, setVisible] = useState(false);
     const [currentRecord, setCurrentRecord] = useState(null);
     const [createVisible, setCreateVisible] = useState(false);
-    const identity = {
-        fullName: 'John Doe',
-        age: '35',
-        address: 'Orchard Street 69',
+    
+    const CreateBooking = async (formData) => {
+        try {
+            // Access the form data
+            const { fullName, age, address, appointmentDate, appointmentSlot } = formData;
+            console.log(appointmentDate);
+            const formattedDate = (appointmentDate["$D"]).toString().padStart(2, '0') + '-' +
+                      (appointmentDate["$M"] + 1).toString().padStart(2, '0') + '-' +
+                      appointmentDate["$y"].toString();
+            console.log(formattedDate);
+            // Call the asynchronous function callRequestAppointment
+            const tx = await callRequestAppointment(20, formattedDate, appointmentSlot, fullName, age);
+            
+            // Once the appointment request is successful, update the state and UI
+            setCreateVisible(false);
+            handleRefresh();
+        } catch (error) {
+            // Handle any errors that occur during the booking creation process
+            console.error('Error creating booking:', error);
+        }
     };
+    
+    
 
     return (
         <Layout>
@@ -178,9 +350,21 @@ const App: React.FC = () => {
                     >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                             <Title level={4} style={{ margin: 0 }}>Booking</Title>
-                            <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateVisible(true)}>
-                                Create Booking
-                            </Button>
+                            <div>
+                                {balance === null ? (
+                                    <div>Loading balance...</div>
+                                ) : (
+                                    <div>Balance: {balance} DEH</div>
+                                )}
+                            </div>
+                            <div>
+                                <Button type="primary" style={{ marginRight: '10px' }} onClick={handleRechargeTokens}>
+                                    Recharge Tokens
+                                </Button>
+                                <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateVisible(true)}>
+                                    Create Booking
+                                </Button>
+                            </div>
                         </div>
                         <Table columns={columns} dataSource={data} />
                         <Modal
@@ -195,10 +379,10 @@ const App: React.FC = () => {
                                 <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{currentRecord?.bookingId}</div>
 
                                 <div style={{ gridColumn: 'span 7' }}><strong>Full Name</strong></div>
-                                <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{identity?.fullName}</div>
+                                <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{name}</div>
 
                                 <div style={{ gridColumn: 'span 7' }}><strong>Age</strong></div>
-                                <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{identity?.age}</div>
+                                <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{age}</div>
 
                                 <div style={{ gridColumn: 'span 7' }}><strong>Address</strong></div>
                                 <div style={{ gridColumn: 'span 17', marginLeft: '8px' }}>{identity?.address}</div>
@@ -227,30 +411,30 @@ const App: React.FC = () => {
                             onCancel={() => setCreateVisible(false)}
                             footer={null}
                         >
-                            <Form layout="vertical" onFinish={() => setCreateVisible(false)}>
-                                <Form.Item label="Full Name">
-                                    <Typography.Text>{identity.fullName}</Typography.Text>
-                                </Form.Item>
-                                <Form.Item label="Age">
-                                    <Typography.Text>{identity.age}</Typography.Text>
-                                </Form.Item>
-                                <Form.Item label="Address">
-                                    <Typography.Text>{identity.address}</Typography.Text>
-                                </Form.Item>
-                                <Form.Item label="Appointment Date">
-                                    <DatePicker style={{ width: '100%' }} />
-                                </Form.Item>
-                                <Form.Item label="Appointment Slot">
-                                    <Select style={{ width: '100%' }}>
-                                        <Option value="10:00 - 11:00">10:00 - 11:00</Option>
-                                        <Option value="11:00 - 12:00">11:00 - 12:00</Option>
-                                        <Option value="12:00 - 13:00">12:00 - 13:00</Option>
-                                    </Select>
-                                </Form.Item>
-                                <Form.Item style={{ marginBottom: 0 }}>
-                                    <Button type="primary" htmlType="submit" style={{ width: '100%' }}>Create Booking</Button>
-                                </Form.Item>
-                            </Form>
+                            <Form layout="vertical" onFinish={(formData) => CreateBooking(formData)}>
+                            <Form.Item label="Full Name" name="fullName">
+                                <Input />
+                            </Form.Item>
+                            <Form.Item label="Age" name="age">
+                                <Input />
+                            </Form.Item>
+                            <Form.Item label="Address" name="address">
+                                <Input />
+                            </Form.Item>
+                            <Form.Item label="Appointment Date" name="appointmentDate">
+                                <DatePicker style={{ width: '100%' }} />
+                            </Form.Item>
+                            <Form.Item label="Appointment Slot" name="appointmentSlot">
+                                <Select style={{ width: '100%' }}>
+                                    <Option value="10:00 - 11:00">10:00 - 11:00</Option>
+                                    <Option value="11:00 - 12:00">11:00 - 12:00</Option>
+                                    <Option value="12:00 - 13:00">12:00 - 13:00</Option>
+                                </Select>
+                            </Form.Item>
+                            <Form.Item style={{ marginBottom: 0 }}>
+                                <Button type="primary" htmlType="submit" style={{ width: '100%' }}>Create Booking</Button>
+                            </Form.Item>
+                        </Form>
                         </Modal>
                     </Content>
                 </Layout>
