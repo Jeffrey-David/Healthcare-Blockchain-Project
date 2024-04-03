@@ -82,7 +82,7 @@ const App: React.FC = () => {
                 };
 
                 if (record.status === 'Approved') {
-                    <Button type="default" onClick={() =>  {setCurrentRecord(record); handleRevokeAccess(record.walletAddress) }}>Revoke Access</Button>
+                    return(<Button type="default" onClick={() =>  {setCurrentRecord(record); handleRevokeAccess(record.walletAddress) }}>Revoke Access</Button>);
                     
                 } else if (record.status === 'Requested') {
                     return (
@@ -136,19 +136,20 @@ const App: React.FC = () => {
     
     useEffect(() => {
         const fetchData = async () => {
-            if (refresh && data.length>0) {
+            if (refresh) {
                 try {
 
                     const contractData = await callListAccessList();
-                    console.log(contractData);
+                    console.log(contractData.length);
                     // patient.patientAddress, patient.name, patient.age, patient.date, patient.medicalRecords
                     const formattedData = contractData.map((item, index) => ({
                         no: index+1,
                         walletAddress: item[0],
                         status: getStatus(item[1])
                     }));
-                    setData(formattedData); // Update the state with the formatted data
-
+                    if(contractData[0][0] !== '0x0000000000000000000000000000000000000000'){
+                        setData(formattedData); // Update the state with the formatted data
+                    }
     
                    setRefresh(false); // Reset the refresh state
                 } catch (error) {
