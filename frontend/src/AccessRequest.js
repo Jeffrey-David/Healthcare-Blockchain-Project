@@ -1,8 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Breadcrumb, Layout, Menu, theme, Select, Typography, Table, Tag, Button, Modal } from 'antd';
 import logo from './logo-main.svg';
-
+import {
+    callStoreRecord,
+    callGrantAccess,
+    callRequestAccess,
+    callRevokeAccess,
+    callListAccessList,
+    callGetAccessRequests,
+    callGetMedicalRecords,
+    callAddThirdParty,
+    isThirdParty,
+    getAddress
+} from './contractAPIs/MedicalRecordAccess.js';
+import { callGetAllAppointments } from './contractAPIs/MedicalAppointment.js';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -28,16 +40,7 @@ const App: React.FC = () => {
             dataIndex: 'walletAddress',
             key: 'walletAddress',
         },
-        {
-            title: 'Requested Date',
-            dataIndex: 'requestedDate',
-            key: 'requestedDate',
-        },
-        {
-            title: 'Approved Date',
-            dataIndex: 'approvedDate',
-            key: 'approvedDate',
-        },
+
         {
             title: 'Status',
             key: 'status',
@@ -64,62 +67,134 @@ const App: React.FC = () => {
             key: 'action',
             render: (text, record) => {
                 let buttonText = '';
-                let buttonAction = () => { };
+                let buttonAction = () => {
+                    setCurrentRecord(record);
+                    Modal.confirm({
+                        title: 'Do you want to revoke this access?',
+                        content: 'When clicked the OK button, this access will be revoked',
+                        onOk() {
+                            handleRevokeAccess(record.walletAddress)
+                        },
+                        onCancel() {
+                            // Optional cancel logic here
+                        },
+                    });
+                };
 
                 if (record.status === 'Approved') {
-                    buttonText = 'Revoke Access';
-                    buttonAction = () => {
-                        Modal.confirm({
-                            title: 'Do you want to revoke this access?',
-                            content: 'When clicked the OK button, this access will be revoked',
-                            onOk() {
-                                // Add your revoke access logic here
-                            },
-                            onCancel() {
-                                // Optional cancel logic here
-                            },
-                        });
-                    };
-                } else if (record.status === 'Waiting for Approval') {
-                    buttonText = 'Approve';
-                    buttonAction = () => { setVisible(true); setCurrentRecord(record); };
+                    <Button type="default" onClick={() =>  {setCurrentRecord(record); handleRevokeAccess(record.walletAddress) }}>Revoke Access</Button>
+                    
+                } else if (record.status === 'Requested') {
+                    return (
+                        <div>
+                        <Button type="default" style={{ marginRight: '10px' }}  onClick={() =>  {setCurrentRecord(record); handleApproveAccess(record.walletAddress) }}>Approve Access</Button>
+                        <Button type="default" onClick={() =>  { setCurrentRecord(record); handleRevokeAccess(record.walletAddress) }}>Reject</Button>
+                        </div>
+                        );
+                    // buttonText = 'Approve';
+                    // buttonAction = () => { setVisible(true); setCurrentRecord(record); handleApproveAccess(record.walletAddress) };
+
                 } else if (record.status === 'Rejected') {
                     return null;
                 }
 
-                return (
-                    <Button type="default" onClick={buttonAction}>{buttonText}</Button>
-                );
+                return null ;
             },
         },
     ];
 
-    const data = [
-        {
-            key: '1',
-            no: '1',
-            walletAddress: '0x5e57D8b7aa3891d168916EbE034EB0BaEadFfAa0',
-            requestedDate: '2022-01-01',
-            approvedDate: new Date().toISOString(),
-            status: 'Approved',
-        },
-        {
-            key: '2',
-            no: '2',
-            walletAddress: '0x045C0273290C409D55d92594df4fc109637234fd',
-            requestedDate: '2022-01-02',
-            approvedDate: null,
-            status: 'Waiting for Approval',
-        },
-        {
-            key: '3',
-            no: '3',
-            walletAddress: '0x532dd338cD6b1505Ca13d22C6e44dd96b6284C9a',
-            requestedDate: '2022-01-03',
-            approvedDate: null,
-            status: 'Rejected',
-        },
-    ];
+    // const data = [
+    //     {
+    //         key: '1',
+    //         no: '1',
+    //         walletAddress: '0x5e57D8b7aa3891d168916EbE034EB0BaEadFfAa0',
+    //         requestedDate: '2022-01-01',
+    //         approvedDate: new Date().toISOString(),
+    //         status: 'Approved',
+    //     },
+    //     {
+    //         key: '2',
+    //         no: '2',
+    //         walletAddress: '0x045C0273290C409D55d92594df4fc109637234fd',
+    //         requestedDate: '2022-01-02',
+    //         approvedDate: null,
+    //         status: 'Waiting for Approval',
+    //     },
+    //     {
+    //         key: '3',
+    //         no: '3',
+    //         walletAddress: '0x532dd338cD6b1505Ca13d22C6e44dd96b6284C9a',
+    //         requestedDate: '2022-01-03',
+    //         approvedDate: null,
+    //         status: 'Rejected',
+    //     },
+    // ];
+
+
+    const [data, setData] = useState([]); // Initialize data state with an empty array
+    const [refresh, setRefresh] = useState(true); // State to trigger data refresh
+    
+    useEffect(() => {
+        const fetchData = async () => {
+            if (refresh && data.length>0) {
+                try {
+
+                    const contractData = await callListAccessList();
+                    console.log(contractData);
+                    // patient.patientAddress, patient.name, patient.age, patient.date, patient.medicalRecords
+                    const formattedData = contractData.map((item, index) => ({
+                        no: index+1,
+                        walletAddress: item[0],
+                        status: getStatus(item[1])
+                    }));
+                    setData(formattedData); // Update the state with the formatted data
+
+    
+                   setRefresh(false); // Reset the refresh state
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            }
+        };
+
+    
+        fetchData(); // Call the fetchData function
+        setRefresh(false);
+    }, [refresh]); 
+
+    function handleRefresh() {
+        // Set the refresh state to true to trigger data fetching
+        setRefresh(true);
+    }
+    function handleApproveAccess(address) {
+        callGrantAccess(address).then(handleRefresh);
+    }
+    function handleRevokeAccess(address) {
+        callRevokeAccess(address).then(handleRefresh);
+    }
+    
+      
+      function getStatus(statusCode) {
+        switch (statusCode) {
+            case 0:
+                return 'Not Requested';
+            case 1:
+                return 'Requested';
+            case 2:
+                return 'Approved';
+            case 3:
+                return 'Revoked';          
+
+          // Add more cases if needed
+          default:
+            return 'Unknown';
+        }
+      }
+
+
+
+
+
 
     const [visible, setVisible] = useState(false);
     const [currentRecord, setCurrentRecord] = useState(null);
@@ -142,7 +217,7 @@ const App: React.FC = () => {
                     }}>
                         <Option value="Role 1">Patient</Option>
                         <Option value="Role 2">Hospital</Option>
-                        <Option value="Role 3">Thirt Party</Option>
+                        <Option value="Role 3">Third Party</Option>
                     </Select>
                 </div>
             </Header>

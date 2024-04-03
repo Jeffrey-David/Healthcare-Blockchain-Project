@@ -12,7 +12,8 @@ import {
     callReleaseMedicalRecord,
     callGetAllAppointments,
     callGetPatientAppointments,
-    callGetPatientDetails
+    callGetPatientDetails,
+    getAddress
   } from './contractAPIs/MedicalAppointment.js';
 
   import { callRechargeTokens } from './contractAPIs/TokenInitializer.js';
@@ -158,7 +159,9 @@ const App: React.FC = () => {
             if (refresh) {
                 try {
                     const contractData = await callGetPatientAppointments();
-                    address = contractData[0][0];
+                    const add = await getAddress().then(thisaddress => {
+                        address = thisaddress;
+                    });
                     console.log(address);
                     const formattedData = contractData.map((item, index) => ({
                         key: (index + 1).toString(),

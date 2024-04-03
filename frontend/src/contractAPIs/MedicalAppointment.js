@@ -1,7 +1,7 @@
 const { ethers } = require('ethers');
 
 const DEHTokenBuild = require('../contracts/MedicalAppointment.json');
-const MEDICALAPPOINTMENT_CONTRACT_ADDRESS="0xc9377b26BCD233E311B406dd67a7b359A47c83aE";
+const MEDICALAPPOINTMENT_CONTRACT_ADDRESS="0x6753B293B4874fF02F0362899012953a88662b0D";
 //const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545'); // Replace with your Ganache URL
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 const signer = provider.getSigner();
@@ -92,6 +92,11 @@ async function callGetPatientDetails(patientAddress) {
     return detail;
 }
 
+async function getAddress() {
+  const address = await signer.getAddress().then(console.log('done'));
+  return address;
+}
+
 module.exports = {
   callRequestAppointment,
   callPayAppointmentfee,
@@ -101,14 +106,15 @@ module.exports = {
   callReleaseMedicalRecord,
   callGetAllAppointments,
   callGetPatientAppointments,
-  callGetPatientDetails
+  callGetPatientDetails,
+  getAddress
 };
 
 
 //callRequestAppointment(12, '01-11-2023', '11-12', 'Jeff', 18);
 //callPayAppointmentfee();
 //callGetAllAppointments();
-callGetPatientAppointments();
+//callGetPatientAppointments();
 //callConfirmAppointment('0x858ef375635A9Ca42d1e0a692dEFF09c2fF92B8E');
 //callProvideService('0x858ef375635A9Ca42d1e0a692dEFF09c2fF92B8E');
 //callAcknowledgeService();

@@ -11,6 +11,8 @@ import {
     callListAccessList,
     callGetAccessRequests,
     callGetMedicalRecords,
+    callAddThirdParty,
+    isThirdParty,
     getAddress
 } from './contractAPIs/MedicalRecordAccess.js';
 
@@ -229,8 +231,8 @@ const App: React.FC = () => {
                                 <div style={{ gridColumn: 'span 8' }}><strong>Address</strong></div>
                                 <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.address}</div>
 
-                                <div style={{ gridColumn: 'span 8' }}><strong>Latest Appointment</strong></div>
-                                <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.latestAppointmentDate}</div>
+                                <div style={{ gridColumn: 'span 8' }}><strong>Date</strong></div>
+                                <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.date}</div>
 
                                 <div style={{ gridColumn: 'span 8' }}><strong>Detail</strong></div>
                                 <div style={{ gridColumn: 'span 16', marginLeft: '8px' }}>{currentRecord?.detailMedicalRecord}</div>

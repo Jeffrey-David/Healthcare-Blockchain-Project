@@ -91,17 +91,21 @@ contract MedicalRecordAccess {
         }
     }
 
-    function getAccessRequests() public view returns (address[] memory, string[] memory, string[] memory) {
+    function getAccessRequests() public view returns (address[] memory, uint[] memory, string[] memory, string[] memory, string[] memory) {
         address _thirdParty = msg.sender;
         require(isThirdParty[_thirdParty], "Third party does not exist");
         address[] memory patientAddresses = new address[](allPatients.length);
         string[] memory names = new string[](allPatients.length);
+        uint[] memory ages = new uint[](allPatients.length);
         string[] memory statuses = new string[](allPatients.length);
+        string[] memory dates = new string[](allPatients.length);
         for (uint i = 0; i < allPatients.length; i++) {
             address patientAddress = allPatients[i];
             AccessStatus hasRequested = patients[patientAddress].accessList[_thirdParty];
             string memory name = patients[patientAddress].name;
+            uint age = patients[patientAddress].age;
             string memory status;
+            string memory date = patients[patientAddress].date[patients[patientAddress].date.length - 1];
             if (hasRequested == AccessStatus.Requested) {
                 status = "Waiting For Approval";
             } else if (hasRequested == AccessStatus.Approved){
@@ -115,8 +119,14 @@ contract MedicalRecordAccess {
             patientAddresses[i] = patientAddress;
             statuses[i] = status;
             names[i] = name;
+            ages[i] = age;
+            dates[i] = date;
         }
-        return (patientAddresses, names, statuses);
+        return (patientAddresses, ages, dates, names, statuses);
+    }
+
+    function checkIsThirdParty(address _address) external view returns (bool) {
+        return isThirdParty[_address];
     }
 
 

@@ -1,5 +1,5 @@
 const { ethers } = require('ethers');
-const MEDICALRECORDACCESS_CONTRACT_ADDRESS="0x391b5b4C79301EB09e714D98D3791E95006D7330"
+const MEDICALRECORDACCESS_CONTRACT_ADDRESS="0xB4A71d9283B5544de0c663E18309303331DeE65d"
 
 const MedicalRecordAccessBuild = require('../contracts/MedicalRecordAccess.json');
 
@@ -66,6 +66,16 @@ async function getAddress() {
     return address;
 }
 
+// Call addThirdParty(address _thirdParty)
+async function callAddThirdParty(address){
+    const tx = await MedicalRecordAccessContract.addThirdParty(address);
+    await tx.wait();
+    return true;
+}
+
+async function isThirdParty(address) {
+    return await MedicalRecordAccessContract.checkIsThirdParty(address);
+}
 
 module.exports = {
     callStoreRecord,
@@ -75,6 +85,8 @@ module.exports = {
     callListAccessList,
     callGetAccessRequests,
     callGetMedicalRecords,
+    callAddThirdParty,
+    isThirdParty,
     getAddress
 }
 
@@ -82,17 +94,12 @@ module.exports = {
 //callStoreRecord('0x858ef375635A9Ca42d1e0a692dEFF09c2fF92B8E', "John", "Dummy",21, '21-02-2022');  //2nd Address
 //callStoreRecord('0x54c39202d9689e7fDFea05ba712E86D992bC931d', "Jeff", "Dummy",22, '02-05-2022');
 //callRequestAccess('0x858ef375635A9Ca42d1e0a692dEFF09c2fF92B8E');
-//callGrantAccess('0xc82098A69E92e4A4484C42e01b9Cb67115a177eC');
-//callGetMedicalRecords('0x858ef375635A9Ca42d1e0a692dEFF09c2fF92B8E');
+//callGrantAccess('0x858ef375635A9Ca42d1e0a692dEFF09c2fF92B8E');
+//callGetMedicalRecords('0xc82098A69E92e4A4484C42e01b9Cb67115a177eC');
 // callRevokeAccess('0xc82098A69E92e4A4484C42e01b9Cb67115a177eC');
 //callListAccessList();
 //callGetAccessRequests();
 
-// const add = getAddress().then(address => {
-//     console.log(address);
-// });
-
-// console.log(add);
 
 
 

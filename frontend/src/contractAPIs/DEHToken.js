@@ -1,5 +1,5 @@
 const { ethers } = require('ethers');
-const DEHTOKEN_CONTRACT_ADDRESS="0xe25eA8C33A0E0e0fA83FFcC16a49B061Bf8A91BC"
+const DEHTOKEN_CONTRACT_ADDRESS="0x8eC3AB34CD792E3906E15e52885046882Fced66c"
 
 const DEHTokenBuild = require('../contracts/DEHToken.json');
 
@@ -64,7 +64,7 @@ async function callAllowance(owner, spender) {
 //callMint('0x858ef375635A9Ca42d1e0a692dEFF09c2fF92B8E', 100);
 //callBalanceOf('0x858ef375635A9Ca42d1e0a692dEFF09c2fF92B8E');
 
-//callBalanceOf('0xe5440AB020c4Ac92768f21db488A359A386ed206');
+callBalanceOf('0xc82098A69E92e4A4484C42e01b9Cb67115a177eC');
 
 module.exports = {
   callTotalSupply,

@@ -1,5 +1,5 @@
 const { ethers } = require('ethers');
-const TOKENINITIALIZER_CONTRACT_ADDRESS="0xfa9340d6d612EC6D382aBd166DD10b55F9A61Eaf";
+const TOKENINITIALIZER_CONTRACT_ADDRESS="0xFcfe807170D885Ce1a89AcFECEcD7d59f76ffc36";
 
 const TokenInitializerBuild = require('../contracts/TokenInitializer.json');
 
