@@ -12,7 +12,7 @@ const LoginPage = () => {
     try {
       // Prompt the user to connect their MetaMask wallet
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      
+      await accounts.wait();
       // Handle the connected accounts
       const selectedAccount = accounts[0];
       console.log('Connected account:', selectedAccount);
