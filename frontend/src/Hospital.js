@@ -289,7 +289,7 @@ const App: React.FC = () => {
                             footer={[
                                 <Button key="Back" type="default" onClick={() => setVisible(false)}>Back</Button>,
                                 currentRecord && currentRecord.status === 'Paid' && <Button key="Approve" type="primary" onClick={() => {handleApprove(currentRecord.address); setVisible(false);}}>Approve</Button>,
-                                currentRecord && currentRecord.status === 'Confirmed' && <Button key="Reject" danger type="primary" onClick={() => {handleProvideService(currentRecord.address); setVisible(false);}}>Provide Service</Button>
+                                currentRecord && currentRecord.status === 'Confirmed' && <Button key="Provide Service" type="primary" onClick={() => {handleProvideService(currentRecord.address); setVisible(false);}}>Provide Service</Button>
                                 //<Button key="Reject" danger type="primary" onClick={() => setVisible(false)}>Reject</Button>
                             ]}
                         >
