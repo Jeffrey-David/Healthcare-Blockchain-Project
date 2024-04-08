@@ -1,8 +1,7 @@
 const { ethers } = require('ethers');
-const MEDICALRECORDACCESS_CONTRACT_ADDRESS="0xB4A71d9283B5544de0c663E18309303331DeE65d"
 
 const MedicalRecordAccessBuild = require('../contracts/MedicalRecordAccess.json');
-
+const MEDICALRECORDACCESS_CONTRACT_ADDRESS = MedicalRecordAccessBuild.networks['5777'].address;
 //const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545'); // Replace with your Ganache URL
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 const signer = provider.getSigner();

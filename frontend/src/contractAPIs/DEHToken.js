@@ -1,7 +1,8 @@
 const { ethers } = require('ethers');
-const DEHTOKEN_CONTRACT_ADDRESS="0x8eC3AB34CD792E3906E15e52885046882Fced66c"
 
 const DEHTokenBuild = require('../contracts/DEHToken.json');
+
+const DEHTOKEN_CONTRACT_ADDRESS= DEHTokenBuild.networks['5777'].address;
 
 //const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545'); // Replace with your Ganache URL
 const provider = new ethers.providers.Web3Provider(window.ethereum);

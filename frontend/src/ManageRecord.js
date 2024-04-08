@@ -158,7 +158,7 @@ const App: React.FC = () => {
                                 age: ages[index], // Assuming this is the fee
                                 appointmentDate: item[4], // Assuming this is the appointment date
                                 appointmentSlot: item[5], // Assuming this is the appointment slot
-                                recordDetail: dummyRecord + item[1],
+                                recordDetail: dummyRecord + item[1] + " on " + item[4],
                                 status: getStatus(item[6]), // Assuming this is the status code
                                 Wallet: item[0]
                             };

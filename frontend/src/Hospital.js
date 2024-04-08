@@ -11,9 +11,14 @@ import {
     callAcknowledgeService,
     callReleaseMedicalRecord,
     callGetAllAppointments,
+    callCancelAppointment,
+    callRejectAppointment,
     callGetPatientAppointments,
-    callGetPatientDetails
+    callGetPatientDetails,
+    getAddress,
   } from './contractAPIs/MedicalAppointment.js';
+
+import { callBalanceOf } from './contractAPIs/DEHToken.js';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -80,7 +85,7 @@ const App: React.FC = () => {
             render: (text, record) => {
                 if (record.status === 'Paid') {
                     return (
-                        <Button type="default" onClick={() => { setVisible(true); setCurrentRecord(record); }}>Approve</Button>
+                        <Button type="default" onClick={() => { setVisible(true); setCurrentRecord(record); }}>Proceed</Button>
                     );
                 }
 
@@ -135,7 +140,8 @@ const App: React.FC = () => {
 
     const [data, setData] = useState([]); // Initialize data state with an empty array
     const [refresh, setRefresh] = useState(true); // State to trigger data refresh
-    
+    const [balance, setBalance] = useState(0);
+    let address;
     useEffect(() => {
         const fetchData = async () => {
             if (refresh) {
@@ -169,8 +175,13 @@ const App: React.FC = () => {
                         Wallet: item[0]
                     }));
                     setData(formattedData); // Update the state with the formatted data
-
-    
+                    const add = await getAddress().then(thisaddress => {
+                        address = thisaddress;
+                    });
+                    if (address) {
+                        const balance = await callBalanceOf(address);
+                        setBalance(balance); // Update the balance state with the fetched balance value
+                    }
                    setRefresh(false); // Reset the refresh state
                 } catch (error) {
                     console.error("Error:", error);
@@ -193,6 +204,9 @@ const App: React.FC = () => {
     function handleProvideService(address) {
         callProvideService(address).then(handleRefresh);
     }
+    function handleRejectAppointment(address) {
+        callRejectAppointment(address).then(handleRefresh);
+    }
     
 
 
@@ -211,6 +225,8 @@ const App: React.FC = () => {
                 return 'Acknowledged Service';
             case 5:
                 return 'Record Released';
+            case 6:
+                return 'Rejected';
           // Add more cases if needed
           default:
             return 'Unknown';
@@ -280,6 +296,13 @@ const App: React.FC = () => {
                     >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                             <Title level={4} style={{ margin: 0 }}>Booking Management</Title>
+                            <div>
+                                {balance === null ? (
+                                    <div>Loading balance...</div>
+                                ) : (
+                                    <div>Balance: {balance} DEH</div>
+                                )}
+                            </div>
                         </div>
                         <Table columns={columns} dataSource={data} />
                         <Modal
@@ -289,6 +312,7 @@ const App: React.FC = () => {
                             footer={[
                                 <Button key="Back" type="default" onClick={() => setVisible(false)}>Back</Button>,
                                 currentRecord && currentRecord.status === 'Paid' && <Button key="Approve" type="primary" onClick={() => {handleApprove(currentRecord.address); setVisible(false);}}>Approve</Button>,
+                                currentRecord && currentRecord.status === 'Paid' && <Button key="Reject" style={{ backgroundColor: '#dc3545', color: '#fff' }} type="primary" onClick={() => {handleRejectAppointment(currentRecord.address); setVisible(false);}}>Reject</Button>,
                                 currentRecord && currentRecord.status === 'Confirmed' && <Button key="Provide Service" type="primary" onClick={() => {handleProvideService(currentRecord.address); setVisible(false);}}>Provide Service</Button>
                                 //<Button key="Reject" danger type="primary" onClick={() => setVisible(false)}>Reject</Button>
                             ]}

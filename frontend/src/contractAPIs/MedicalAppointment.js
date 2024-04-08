@@ -1,13 +1,13 @@
 const { ethers } = require('ethers');
 
-const DEHTokenBuild = require('../contracts/MedicalAppointment.json');
-const MEDICALAPPOINTMENT_CONTRACT_ADDRESS="0x6753B293B4874fF02F0362899012953a88662b0D";
+const MedicalAppointmentBuild = require('../contracts/MedicalAppointment.json');
+const MEDICALAPPOINTMENT_CONTRACT_ADDRESS=MedicalAppointmentBuild.networks['5777'].address;
 //const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545'); // Replace with your Ganache URL
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 const signer = provider.getSigner();
 // const Hospital = provider.getSigner();
 // const Patient = provider.getSigner(1);
-const MedicalAppointmentContract = new ethers.Contract(MEDICALAPPOINTMENT_CONTRACT_ADDRESS, DEHTokenBuild.abi, signer);
+const MedicalAppointmentContract = new ethers.Contract(MEDICALAPPOINTMENT_CONTRACT_ADDRESS, MedicalAppointmentBuild.abi, signer);
 
 
 
@@ -29,6 +29,20 @@ async function callPayAppointmentfee() {
 // Call confirmAppointment(address _patientAddress) function
 async function callConfirmAppointment(patientAddress) {
   const tx = await MedicalAppointmentContract.confirmAppointment(patientAddress);
+  await tx.wait();
+  return true;
+}
+
+// Call rejectAppointment(address _patientAddress) function
+async function callRejectAppointment(patientAddress) {
+  const tx = await MedicalAppointmentContract.rejectAppointment(patientAddress);
+  await tx.wait();
+  return true;
+}
+
+// Call cancelAppointment() function
+async function callCancelAppointment() {
+  const tx = await MedicalAppointmentContract.cancelAppointment();
   await tx.wait();
   return true;
 }
@@ -99,6 +113,8 @@ async function getAddress() {
 
 module.exports = {
   callRequestAppointment,
+  callCancelAppointment,
+  callRejectAppointment,
   callPayAppointmentfee,
   callConfirmAppointment,
   callProvideService,

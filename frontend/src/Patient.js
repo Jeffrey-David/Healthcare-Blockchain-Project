@@ -13,7 +13,8 @@ import {
     callGetAllAppointments,
     callGetPatientAppointments,
     callGetPatientDetails,
-    getAddress
+    getAddress,
+    callCancelAppointment
   } from './contractAPIs/MedicalAppointment.js';
 
   import { callRechargeTokens } from './contractAPIs/TokenInitializer.js';
@@ -78,7 +79,7 @@ const App: React.FC = () => {
                 let buttonText = 'Detail';
                 let buttonAction = () => { setVisible(true); setCurrentRecord(record); };
                 if (record.status === 'Pending Payment') {
-                    buttonText = 'Pay Appointment Fee';
+                    buttonText = 'Pay';
                     buttonAction = () => {
                         Modal.confirm({
                             title: 'Pay Appointment Fee',
@@ -96,7 +97,33 @@ const App: React.FC = () => {
                             },
                         });
                     };
+                    let buttonText2 = 'Cancel';
+                    let buttonAction2 = () => {
+                        Modal.confirm({
+                            title: 'Cancel Appointment',
+                            content: 'Are you sure you want to cancel your appointment?',
+                            onOk() {
+                                callCancelAppointment().then(() => {
+                                    // Call the refresh function after the payment is done
+                                    handleRefresh();
+                                }).catch(error => {
+                                    console.error("Error Cancelling Appointment:", error);
+                                });
+                            },
+                            onCancel() {
+                                // Handle the cancellation action here
+                            },
+                        });
+                    };
+
+                    return (
+                        <div>
+                        <Button type='primary' onClick={buttonAction}>{buttonText}</Button>
+                        <Button type="default" style={{ backgroundColor: '#dc3545', color: '#fff', marginLeft:'10px' }} onClick={buttonAction2}>{buttonText2}</Button>
+                        </div>
+                    );
                 }
+
                 else if (record.status === 'Service Provided') {
                     buttonText = 'Acknowledge Service';
                     buttonAction = () => {
@@ -116,6 +143,55 @@ const App: React.FC = () => {
                             },
                         });
                     };
+                }
+
+
+                else if (record.status === 'Confirmed') {
+                    buttonText = 'Cancel';
+                    buttonAction = () => {
+                        Modal.confirm({
+                            title: 'Cancel Appointment',
+                            content: 'Are you sure you want to cancel your appointment?',
+                            onOk() {
+                                callCancelAppointment().then(() => {
+                                    // Call the refresh function after the payment is done
+                                    handleRefresh();
+                                }).catch(error => {
+                                    console.error("Error Cancelling Appointment:", error);
+                                });
+                            },
+                            onCancel() {
+                                // Handle the cancellation action here
+                            },
+                        });
+                    };
+                    return (
+                        <Button type="default" style={{ backgroundColor: '#dc3545', color: '#fff'}} onClick={buttonAction}>{buttonText}</Button>
+                    );
+                }
+
+                else if (record.status === 'Paid') {
+                    buttonText = 'Cancel';
+                    buttonAction = () => {
+                        Modal.confirm({
+                            title: 'Cancel Appointment',
+                            content: 'Are you sure you want to cancel your appointment?',
+                            onOk() {
+                                callCancelAppointment().then(() => {
+                                    // Call the refresh function after the payment is done
+                                    handleRefresh();
+                                }).catch(error => {
+                                    console.error("Error Cancelling Appointment:", error);
+                                });
+                            },
+                            onCancel() {
+                                // Handle the cancellation action here
+                            },
+                        });
+                    };
+                    return (
+                        <Button type="default" style={{ backgroundColor: '#dc3545', color: '#fff'}} onClick={buttonAction}>{buttonText}</Button>
+                    );
                 }
 
                 return (
@@ -233,6 +309,8 @@ const App: React.FC = () => {
                 return 'Acknowledged Service';
             case 5:
                 return 'Record Released';
+            case 6:
+                return 'Rejected';
           // Add more cases if needed
           default:
             return 'Unknown';

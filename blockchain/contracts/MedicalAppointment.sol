@@ -6,7 +6,7 @@ import "./MedicalRecordAccess.sol"; // Import the other smart contract
 import "./DEHToken.sol";
 
 contract MedicalAppointment {
-       enum AppointmentStatus { Pending, Paid, Confirmed, ServiceProvided, AcknowledgedService, RecordReleased }
+       enum AppointmentStatus { Pending, Paid, Confirmed, ServiceProvided, AcknowledgedService, RecordReleased, Rejected }
 
     struct Appointment {
         address patientAddresses;
@@ -63,7 +63,7 @@ contract MedicalAppointment {
         }
 
         else {
-        require(patients[msg.sender].appointments.length == 0 || hasLastAppointmentRecordReleased(msg.sender), "Last appointment's status must be completed and released");
+        require(patients[msg.sender].appointments.length == 0 || hasLastAppointmentRecordReleased(msg.sender), "Last appointment's status must be completed and released or rejected");
         }
         patients[msg.sender].name = _name;
         patients[msg.sender].age = _age;
@@ -84,7 +84,7 @@ contract MedicalAppointment {
         } else {
             // Get the status of the last appointment
             Appointment storage lastAppointment = patients[_patientAddress].appointments[patients[_patientAddress].appointments.length - 1];
-            return lastAppointment.status == AppointmentStatus.RecordReleased;
+            return (lastAppointment.status == AppointmentStatus.RecordReleased || lastAppointment.status == AppointmentStatus.Rejected);
         }
 }
 
@@ -133,6 +133,64 @@ contract MedicalAppointment {
         // Update the latest appointment status to "Confirmed"
         latestAppointment.status = AppointmentStatus.Confirmed;
     }
+
+    function rejectAppointment(address _patientAddress) public {
+        require(msg.sender == hospital, "Only hospital can reject appointments");
+        Patient storage patient = patients[_patientAddress];
+        
+        // Ensure that the patient exists and has appointments
+        require(patient.patientAddress != address(0), "Patient not found");
+        require(patient.appointments.length > 0, "Patient has no appointments");
+        
+        // Find the latest appointment of the patient
+        Appointment storage latestAppointment = patient.appointments[patient.appointments.length - 1];
+        
+        // Ensure that the latest appointment status is "Paid" before confirming
+        require(latestAppointment.status == AppointmentStatus.Paid, "Latest appointment status must be Paid");
+
+        uint refund = latestAppointment.fee*2;
+
+        // Transfer half of the fee to the hospital
+        require(dehToken.transfer(_patientAddress, refund), "Token transfer to patient failed");
+        
+        // Update the latest appointment status to "Confirmed"
+        latestAppointment.status = AppointmentStatus.Rejected;
+    }
+
+
+    function cancelAppointment() public {
+        Patient storage patient = patients[msg.sender];
+        
+        // Ensure that the patient has appointments
+        require(patient.appointments.length > 0, "Patient has no appointments");
+        
+        // Find the latest appointment of the patient
+        Appointment storage latestAppointment = patient.appointments[patient.appointments.length - 1];
+        
+        require(latestAppointment.status == AppointmentStatus.Paid || latestAppointment.status == AppointmentStatus.Pending || latestAppointment.status == AppointmentStatus.Confirmed, "Latest appointment status must be Paid");
+
+        // Ensure that the latest appointment status is "Pending" before allowing payment
+        if(latestAppointment.status == AppointmentStatus.Paid){
+            uint refund = latestAppointment.fee*2;
+            require(dehToken.transfer(msg.sender, refund), "Token transfer to patient failed");
+            latestAppointment.status = AppointmentStatus.Rejected;
+        }
+
+        if(latestAppointment.status == AppointmentStatus.Pending){
+            latestAppointment.status = AppointmentStatus.Rejected;
+        }
+
+        if(latestAppointment.status == AppointmentStatus.Confirmed){
+            uint refund = (latestAppointment.fee * 3) / 2;
+            uint fine = (latestAppointment.fee) / 2;
+            require(dehToken.transfer(msg.sender, refund), "Token transfer to patient failed");
+            require(dehToken.transfer(hospital, fine), "Token transfer to patient failed");
+            latestAppointment.status = AppointmentStatus.Rejected;
+        }
+    }
+
+
+
 
 
 
